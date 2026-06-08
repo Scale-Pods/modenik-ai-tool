@@ -15,7 +15,9 @@ import {
   CheckCircle,
   HelpCircle,
   ArrowRight,
-  Calculator
+  Calculator,
+  Download,
+  Share2
 } from 'lucide-react';
 
 interface BattleCardModalProps {
@@ -54,6 +56,131 @@ export default function BattleCardModal({
       setIsLogged(false);
       onClose();
     }, 1500);
+  };
+
+  const handleDownloadSlab = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Modenik Slab Details - ${distributorName || 'UP DB'}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; }
+            h1 { color: #ED1C24; border-bottom: 2px solid #ef4444; padding-bottom: 12px; margin-bottom: 24px; font-weight: 800; font-size: 24px; }
+            .section { margin-bottom: 28px; }
+            .label { font-weight: bold; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+            .payout { font-size: 22px; font-weight: 800; color: #0f172a; margin: 8px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+            th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+            th { background-color: #f8fafc; font-weight: bold; color: #475569; }
+            .highlight { background-color: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 12px; margin-top: 10px; }
+            .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+            .badge-emerald { background-color: #d1fae5; color: #065f46; }
+            .badge-blue { background-color: #dbeafe; color: #1e40af; }
+          </style>
+        </head>
+        <body>
+          <h1>Modenik Lifestyle - Distributor Slab Projections</h1>
+          
+          <div class="section">
+            <div class="label">Distributor Account</div>
+            <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${distributorName || 'UP DB (1004821)'}</div>
+            
+            <div class="highlight">
+              <span class="label" style="color: #991b1b;">Active Challenge Milestone</span>
+              <p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 600; color: #7f1d1d;">
+                Add <strong>₹40 Lakhs primary inventory bulk order</strong> this quarter to unlock a <strong>₹2 Lakhs additional incentive payout</strong> (2.0% Slab Unlock!).
+              </p>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="label">Projected Milestone Slab Targets</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Bulk Order Addition</th>
+                  <th>Projected Total Payout</th>
+                  <th>Multiplier Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>None (Current Base)</td>
+                  <td>₹5.7 Lakhs</td>
+                  <td>Base earnings rate</td>
+                </tr>
+                <tr>
+                  <td>+₹15 Lakhs</td>
+                  <td>₹6.1 Lakhs</td>
+                  <td>1.1x Active Tier</td>
+                </tr>
+                <tr>
+                  <td>+₹30 Lakhs</td>
+                  <td>₹6.7 Lakhs</td>
+                  <td>1.25x High Tier</td>
+                </tr>
+                <tr style="background-color: #fef2f2; font-weight: bold;">
+                  <td>+₹40 Lakhs (Target)</td>
+                  <td>₹7.7 Lakhs</td>
+                  <td style="color: #dc2626;">2.0% Peak Slab Unlock ⚡</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <div class="label">Product Line Competitive Analysis (Estimated ROI)</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Brand Segment</th>
+                  <th>Retail Price</th>
+                  <th>Retailer Margin</th>
+                  <th>Replenishment Cycle</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Dixcy Josh Vest (Modenik)</strong></td>
+                  <td>₹110</td>
+                  <td style="color: #059669; font-weight: bold;">18.0%</td>
+                  <td>4 Days</td>
+                  <td><span class="badge badge-emerald">MOMENTUM</span></td>
+                </tr>
+                <tr>
+                  <td>Lux Venus Vest (Competitor)</td>
+                  <td>₹105</td>
+                  <td>12.5%</td>
+                  <td>10 Days</td>
+                  <td><span>SATURATED</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div style="font-size: 11px; text-align: center; color: #94a3b8; margin-top: 50px; border-t: 1px solid #e2e8f0; padding-top: 15px;">
+            &copy; 2026 Modenik Lifestyle. Confidential Sales Decision Sheet.
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  const handleShareWhatsApp = () => {
+    const message = `*Modenik Slab Details for ${distributorName || 'UP DB'}*:\n\n• Target Challenge: Add *₹40 L* primary order to unlock *₹2 L* extra incentive (2.0% Slab Unlock).\n• Replenishment: 4-day quick turnaround.\n\nCalculate your ROI now: Modenik Josh Vest gives 18% margin (vs 12.5% competitor standard). Let's unlock the next slab!`;
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
@@ -186,6 +313,32 @@ export default function BattleCardModal({
                 </div>
               </div>
             </section>
+
+            {/* Share and Download section */}
+            <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="text-left">
+                <h5 className="text-xs font-extrabold text-slate-900">Share Slab Details with Distributor</h5>
+                <p className="text-[10px] text-slate-500 font-semibold mt-0.5">Send current milestone & payout projections directly to distributor's phone.</p>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={handleDownloadSlab}
+                  className="flex-1 sm:flex-none px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-extrabold text-[11px] rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Download Slab</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShareWhatsApp}
+                  className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>WhatsApp Share</span>
+                </button>
+              </div>
+            </div>
 
             {/* Profitability Gap Analysis block */}
             <section className="space-y-4">
