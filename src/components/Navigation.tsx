@@ -45,11 +45,16 @@ export default function Navigation({
     setTimeout(() => setIsSyncing(false), 1200);
   };
 
-  const navItems = [
+  const navItems = role === 'ASM' ? [
     { id: 'dashboard' as Screen, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'distributors' as Screen, label: 'Distributors', icon: Users },
     { id: 'planner' as Screen, label: 'Planner', icon: CalendarDays },
     { id: 'phase23' as Screen, label: 'Phase 2/3', icon: Rocket, isFuture: true },
+  ] : [
+    { id: 'dashboard' as Screen, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'distributors' as Screen, label: 'Analytics Hub', icon: Users },
+    { id: 'planner' as Screen, label: 'Joint Audits', icon: CalendarDays },
+    { id: 'phase23' as Screen, label: 'Strategy Cockpit', icon: Rocket, isFuture: true },
   ];
 
   // Professional Unsplash headshots instead of AI faces

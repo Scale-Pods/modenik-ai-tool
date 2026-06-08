@@ -21,6 +21,9 @@ import ASMProfile from './components/ASMProfile';
 import ManagerProfile from './components/ManagerProfile';
 import LandingPage from './components/LandingPage';
 import SupportModal from './components/SupportModal';
+import ManagerAnalyticsHub from './components/ManagerAnalyticsHub';
+import ManagerReviewPlanner from './components/ManagerReviewPlanner';
+import ManagerStrategyCockpit from './components/ManagerStrategyCockpit';
 
 export default function App() {
   const [showLanding, setShowLanding] = useState<boolean>(true);
@@ -70,12 +73,18 @@ export default function App() {
   }
 
   // Visual database for Planner view
-  const weeklyPlannerVisits = [
-    { day: 'Monday', time: '10:00 AM', client: 'UP DB (1004821)', status: 'COMPLETED', address: 'Lucknow North Cluster' },
-    { day: 'Tuesday', time: '11:30 AM', client: 'Nagar DB (1003498)', status: 'COMPLETED', address: 'Kanpur Central Gate' },
-    { day: 'Wednesday', time: '02:00 PM', client: 'APTL DB (1007421)', status: 'SCHEDULED', address: 'Varanasi East Mall' },
-    { day: 'Thursday', time: '09:00 AM', client: 'Bihar DB (1005291)', status: 'PENDING', address: 'Patna South Gali' },
-    { day: 'Friday', time: '04:30 PM', client: 'Lucknow Hub', status: 'PENDING', address: 'Sect 12 Depot' }
+  const weeklyPlannerVisits = plannerOptimized ? [
+    { day: 'Monday', time: '09:30 AM', client: 'UP DB (1004821)', status: 'COMPLETED', address: 'Lucknow North Cluster', optimized: true },
+    { day: 'Tuesday', time: '10:15 AM', client: 'Nagar DB (1003498)', status: 'COMPLETED', address: 'Kanpur Central Gate', optimized: true },
+    { day: 'Wednesday', time: '11:30 AM', client: 'Bihar DB (1005291)', status: 'SCHEDULED', address: 'Patna South Gali', optimized: true },
+    { day: 'Thursday', time: '01:45 PM', client: 'APTL DB (1007421)', status: 'SCHEDULED', address: 'Varanasi East Mall', optimized: true },
+    { day: 'Friday', time: '03:15 PM', client: 'Lucknow Hub', status: 'SCHEDULED', address: 'Sect 12 Depot', optimized: true }
+  ] : [
+    { day: 'Monday', time: '10:00 AM', client: 'UP DB (1004821)', status: 'COMPLETED', address: 'Lucknow North Cluster', optimized: false },
+    { day: 'Tuesday', time: '11:30 AM', client: 'Nagar DB (1003498)', status: 'COMPLETED', address: 'Kanpur Central Gate', optimized: false },
+    { day: 'Wednesday', time: '02:00 PM', client: 'APTL DB (1007421)', status: 'SCHEDULED', address: 'Varanasi East Mall', optimized: false },
+    { day: 'Thursday', time: '09:00 AM', client: 'Bihar DB (1005291)', status: 'PENDING', address: 'Patna South Gali', optimized: false },
+    { day: 'Friday', time: '04:30 PM', client: 'Lucknow Hub', status: 'PENDING', address: 'Sect 12 Depot', optimized: false }
   ];
 
   return (
@@ -126,21 +135,24 @@ export default function App() {
               )}
 
               {/* SCREEN 2: Distributors detailed 360 sheet view */}
-              {activeScreen === 'distributors' && (
+              {activeScreen === 'distributors' && role === 'ASM' && (
                 <DistributorDetails 
                   searchFilter={searchQuery}
                   onOpenBattleCard={(name) => setBattleCard({ isOpen: true, distributorName: name })}
                 />
               )}
+              {activeScreen === 'distributors' && role === 'Manager' && (
+                <ManagerAnalyticsHub />
+              )}
 
               {/* SCREEN 3: Routine Planner agenda calendar */}
-              {activeScreen === 'planner' && (
+              {activeScreen === 'planner' && role === 'ASM' && (
                 <div className="space-y-8 text-left">
                   {/* Title banner */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h2 className="text-2xl font-black text-slate-900 tracking-tight">Active Visit Planner</h2>
-                      <p className="text-sm font-semibold text-slate-500">Route &amp; Travel optimization for {role === 'ASM' ? 'Rakesh' : 'Manoranjan'}</p>
+                      <p className="text-sm font-semibold text-slate-500">Route &amp; Travel optimization for Rakesh</p>
                     </div>
 
                     <button 
@@ -210,8 +222,8 @@ export default function App() {
                               <div key={v.day} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 first:pt-1 last:pb-1">
                                 <div className="flex items-center gap-4">
                                   <div className="w-12 text-center shrink-0">
-                                    <p className="text-xs font-black text-slate-800">{v.day.slice(0, 3)}</p>
-                                    <p className="text-[10px] font-bold text-slate-400">Day {i + 1}</p>
+                                    <p className="text-xs font-black text-slate-850">{v.day.slice(0, 3)}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 font-mono">Day {i + 1}</p>
                                   </div>
                                   <div className="h-8 w-[1.5px] bg-slate-150"></div>
                                   <div>
@@ -245,8 +257,8 @@ export default function App() {
                         <h3 className="text-sm font-bold text-slate-955 tracking-tight uppercase">Visit Protocol</h3>
                       </div>
 
-                      <div className="space-y-4 text-xs text-slate-600 leading-relaxed font-semibold">
-                        <div className="p-3 bg-red-50 text-red-950 rounded-xl border border-red-100 flex items-start gap-2.5">
+                      <div className="space-y-4 text-xs text-slate-650 leading-relaxed font-semibold">
+                        <div className="p-3 bg-red-50 text-red-955 rounded-xl border border-red-100 flex items-start gap-2.5">
                           <AlertCircle className="w-4 h-4 text-red-655 shrink-0" />
                           <p className="text-[11px]">
                             Always review the active <strong>AI Battle Card</strong> immediately before greeting the distributor.
@@ -272,9 +284,17 @@ export default function App() {
                   </div>
                 </div>
               )}
+              {activeScreen === 'planner' && role === 'Manager' && (
+                <ManagerReviewPlanner />
+              )}
 
               {/* SCREEN 4: Combined futuristic Phase 2 & 3 Previews */}
-              {activeScreen === 'phase23' && <Phase23Preview />}
+              {activeScreen === 'phase23' && role === 'ASM' && (
+                <Phase23Preview />
+              )}
+              {activeScreen === 'phase23' && role === 'Manager' && (
+                <ManagerStrategyCockpit />
+              )}
 
               {/* SCREEN 5: Separated Role Profile Pages */}
               {activeScreen === 'profile' && role === 'ASM' && (
