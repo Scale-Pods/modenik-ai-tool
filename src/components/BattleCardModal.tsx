@@ -58,121 +58,6 @@ export default function BattleCardModal({
     }, 1500);
   };
 
-  const buildSlabHTML = (forPrint = false) => {
-    const selectedLabel = selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`;
-    return `
-      <html>
-        <head>
-          <title>Modenik Slab Details - ${distributorName || 'UP DB'}</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; }
-            h1 { color: #ED1C24; border-bottom: 2px solid #ef4444; padding-bottom: 12px; margin-bottom: 24px; font-weight: 800; font-size: 24px; }
-            .section { margin-bottom: 28px; }
-            .label { font-weight: bold; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-            .payout { font-size: 22px; font-weight: 800; color: #0f172a; margin: 8px 0; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-            th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
-            th { background-color: #f8fafc; font-weight: bold; color: #475569; }
-            .highlight { background-color: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 12px; margin-top: 10px; }
-            .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-            .badge-emerald { background-color: #d1fae5; color: #065f46; }
-            .badge-blue { background-color: #dbeafe; color: #1e40af; }
-          </style>
-        </head>
-        <body>
-          <h1>Modenik Lifestyle - Distributor Slab Projections</h1>
-          <div class="section">
-            <div class="label">Distributor Account</div>
-            <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${distributorName || 'UP DB (1004821)'}</div>
-            <div class="highlight">
-              <span class="label" style="color: #991b1b;">Active Challenge Milestone</span>
-              <p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 600; color: #7f1d1d;">
-                Add <strong>₹40 Lakhs primary inventory bulk order</strong> this quarter to unlock a <strong>₹2 Lakhs additional incentive payout</strong> (2.0% Slab Unlock!).
-              </p>
-            </div>
-          </div>
-          <div class="section">
-            <div class="label">Selected Projection: ${selectedLabel}</div>
-            <div class="payout">${currentProjection.base}</div>
-            <div style="margin-top: 20px;">
-              <div class="label">Projected Milestone Slab Targets</div>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Bulk Order Addition</th>
-                    <th>Projected Total Payout</th>
-                    <th>Multiplier Level</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>None (Current Base)</td>
-                    <td>₹5.7 Lakhs</td>
-                    <td>Base earnings rate</td>
-                  </tr>
-                  <tr>
-                    <td>+₹15 Lakhs</td>
-                    <td>₹6.1 Lakhs</td>
-                    <td>1.1x Active Tier</td>
-                  </tr>
-                  <tr>
-                    <td>+₹30 Lakhs</td>
-                    <td>₹6.7 Lakhs</td>
-                    <td>1.25x High Tier</td>
-                  </tr>
-                  <tr style="background-color: #fef2f2; font-weight: bold;">
-                    <td>+₹40 Lakhs (Target)</td>
-                    <td>₹7.7 Lakhs</td>
-                    <td style="color: #dc2626;">2.0% Peak Slab Unlock ⚡</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="section">
-            <div class="label">Product Line Analysis (Estimated ROI)</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Brand Segment</th>
-                  <th>Retail Price</th>
-                  <th>Retailer Margin</th>
-                  <th>Replenishment Cycle</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Dixcy Josh Vest (Modenik)</strong></td>
-                  <td>₹110</td>
-                  <td style="color: #059669; font-weight: bold;">18.0%</td>
-                  <td>4 Days</td>
-                  <td><span class="badge badge-emerald">MOMENTUM</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Dixcy Scott Trunk (Modenik)</strong></td>
-                  <td>₹180</td>
-                  <td style="color: #059669; font-weight: bold;">16.5%</td>
-                  <td>4 Days</td>
-                  <td><span class="badge badge-emerald">HIGH VOLUME</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Dixcy Scott Brief (Modenik)</strong></td>
-                  <td>₹130</td>
-                  <td style="color: #059669; font-weight: bold;">17.2%</td>
-                  <td>4 Days</td>
-                  <td><span class="badge badge-blue">STABLE</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="font-size: 11px; text-align: center; color: #94a3b8; margin-top: 50px; border-t: 1px solid #e2e8f0; padding-top: 15px;">
-            &copy; 2026 Modenik Lifestyle. Confidential Sales Decision Sheet.
-          </div>
-        </body>
-      </html>
-    `;
-  };
 
   const getPdfHtml = () => {
     const selectedLabel = selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`;
@@ -278,29 +163,8 @@ export default function BattleCardModal({
     }, 600);
   };
 
-  const handleShareWhatsApp = async () => {
-    const html = getPdfHtml();
-    const blob = new Blob([html], { type: 'text/html' });
-    const fileName = `Modenik_Slab_${(distributorName || 'UP_DB').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
-    const file = new File([blob], fileName, { type: 'application/pdf' });
-
-    // Try native Web Share API (mobile browsers, including Chrome on Android)
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: `Modenik Slab Details — ${distributorName || 'UP DB'}`,
-          text: `Slab projection document for ${distributorName || 'UP DB'}. Target: Add ₹40L to unlock ₹2L extra incentive.`,
-        });
-        return;
-      } catch (_) {
-        // User cancelled or share failed — fall through to WhatsApp URL
-      }
-    }
-
-    // Fallback: download file first, then open WhatsApp with instructions
-    handleDownloadSlab();
-    const message = `*Modenik Slab Details — ${distributorName || 'UP DB'}*\n\n📄 Please find the Slab Projection PDF (just downloaded to your device). Attach it here.\n\n• Target Challenge: Add *₹40 L* bulk order → unlock *₹2 L* extra payout (2.0% Slab!)\n• Current Selection: ${selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`} → ${currentProjection.base}\n• 4-day replenishment turnaround\n\n_Generated by Modenik AI Sales Tool_`;
+  const handleShareWhatsApp = () => {
+    const message = `*Modenik Slab Details — ${distributorName || 'UP DB'}*\n\n🎯 *Target Challenge:* Add ₹40 L bulk order → unlock ₹2 L extra payout (2.0% Slab Unlock!)\n📊 *Current Selection:* ${selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`} → ${currentProjection.base}\n🔄 *Replenishment:* 4-day turnaround\n📈 *Margin:* 18% (vs 12.5% competitor)\n\n_Generated by Modenik AI Sales Tool_`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };

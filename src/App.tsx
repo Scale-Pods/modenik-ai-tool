@@ -420,7 +420,10 @@ export default function App() {
 
               {/* SCREEN 6: Separated Role Profile Pages */}
               {activeScreen === 'profile' && role === 'ASM' && (
-                <ASMProfile onLogout={() => setIsLoggedIn(false)} />
+                <ASMProfile 
+                  onLogout={() => setIsLoggedIn(false)} 
+                  onNavigateToMonthlyPlanner={() => setActiveScreen('monthly_planner')}
+                />
               )}
               {activeScreen === 'profile' && role === 'Manager' && (
                 <ManagerProfile 
