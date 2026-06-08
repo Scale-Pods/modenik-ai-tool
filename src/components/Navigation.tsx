@@ -72,7 +72,7 @@ export default function Navigation({
       <aside 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`hidden md:flex flex-col fixed left-0 top-0 h-full bg-white/70 backdrop-blur-xl border-r border-slate-100 p-4 gap-8 z-45 shadow-sm pt-8 transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex flex-col fixed left-0 top-0 h-full bg-white/70 backdrop-blur-xl border-r border-slate-100 p-4 gap-8 z-[45] shadow-sm pt-8 transition-all duration-300 ease-in-out ${
           isHovered ? 'w-64 px-6' : 'w-20 px-3.5 items-center'
         }`}
       >
@@ -336,7 +336,7 @@ export default function Navigation({
       </AnimatePresence>
 
       {/* 4. Touch Mobile Bottom Nav-Bar sticky layout */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-45 bg-white/85 backdrop-blur-2xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl flex justify-around items-center px-4 py-3 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full z-[45] bg-white/85 backdrop-blur-2xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl flex justify-around items-center px-4 py-3 pb-safe">
         {navItems.map((item) => {
           const IconComponent = item.icon;
           const isActive = activeScreen === item.id;

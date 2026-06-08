@@ -58,7 +58,7 @@ export default function BattleCardModal({
     }, 1500);
   };
 
-  const buildSlabHTML = () => {
+  const buildSlabHTML = (forPrint = false) => {
     const selectedLabel = selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`;
     return `
       <html>
@@ -174,22 +174,133 @@ export default function BattleCardModal({
     `;
   };
 
-  const handleDownloadSlab = () => {
-    const html = buildSlabHTML();
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Modenik_Slab_${(distributorName || 'UP_DB').replace(/[^a-zA-Z0-9]/g, '_')}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const getPdfHtml = () => {
+    const selectedLabel = selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`;
+    return `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Modenik Slab Details - ${distributorName || 'UP DB'}</title>
+    <style>
+      @page { size: A4; margin: 20mm; }
+      * { box-sizing: border-box; }
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e293b; line-height: 1.6; font-size: 13px; margin: 0; padding: 0; }
+      .header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 24px 30px; border-radius: 0 0 12px 12px; margin-bottom: 24px; }
+      .header h1 { margin: 0 0 4px 0; font-size: 20px; font-weight: 800; }
+      .header p { margin: 0; font-size: 11px; opacity: 0.7; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+      .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; background: #dc2626; color: white; margin-top: 8px; }
+      .section { margin: 0 30px 20px; }
+      .section-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; }
+      .highlight-box { background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; }
+      .highlight-box .label { font-size: 10px; font-weight: 800; color: #991b1b; text-transform: uppercase; letter-spacing: 0.05em; }
+      .highlight-box p { margin: 6px 0 0; font-size: 12px; font-weight: 600; color: #7f1d1d; }
+      .payout-display { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; margin-bottom: 16px; }
+      .payout-amount { font-size: 26px; font-weight: 900; color: #0f172a; }
+      .payout-label { font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+      .payout-multiplier { font-size: 11px; font-weight: 800; background: #ff6b00; color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; }
+      th { background: #f8fafc; font-weight: 700; color: #475569; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; padding: 10px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+      td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+      tr:last-child td { border-bottom: none; }
+      .peak-row { background: #fff7ed; font-weight: 700; }
+      .peak-row td:last-child { color: #dc2626; }
+      .badge-emerald { background: #d1fae5; color: #065f46; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+      .badge-blue { background: #dbeafe; color: #1e40af; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+      .footer { margin: 30px 30px 0; border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 10px; text-align: center; color: #94a3b8; font-weight: 600; }
+      @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Modenik Lifestyle</h1>
+      <p>Distributor Slab Projection Report</p>
+      <div class="badge">Confidential · Sales</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Distributor Account</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:12px;">${distributorName || 'UP DB (1004821)'}</div>
+      <div class="highlight-box">
+        <div class="label">Active Challenge Milestone</div>
+        <p>Add <strong>₹40 Lakhs primary inventory bulk order</strong> this quarter to unlock a <strong>₹2 Lakhs additional incentive payout</strong> (2.0% Slab Unlock!).</p>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Selected Projection: ${selectedLabel}</div>
+      <div class="payout-display">
+        <div>
+          <div class="payout-label">Projected Incentive</div>
+          <div class="payout-amount">${currentProjection.base}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="payout-multiplier">${currentProjection.multiplier}</div>
+          <div style="font-size:10px;color:#64748b;font-weight:600;margin-top:6px;">${currentProjection.label}</div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:16px;">Milestone Slab Targets</div>
+      <table>
+        <thead><tr><th>Bulk Order Addition</th><th>Projected Total Payout</th><th>Multiplier Level</th></tr></thead>
+        <tbody>
+          <tr><td>None (Current Base)</td><td>₹5.7 Lakhs</td><td>Base earnings rate</td></tr>
+          <tr><td>+₹15 Lakhs</td><td>₹6.1 Lakhs</td><td>1.1x Active Tier</td></tr>
+          <tr><td>+₹30 Lakhs</td><td>₹6.7 Lakhs</td><td>1.25x High Tier</td></tr>
+          <tr class="peak-row"><td>+₹40 Lakhs (Target)</td><td>₹7.7 Lakhs</td><td>2.0% Peak Slab Unlock ⚡</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <div class="section-title">Product Line Analysis (Estimated ROI)</div>
+      <table>
+        <thead><tr><th>Brand Segment</th><th>Retail Price</th><th>Retailer Margin</th><th>Replenishment</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Dixcy Josh Vest (Modenik)</strong></td><td>₹110</td><td style="color:#059669;font-weight:800;">18.0%</td><td>4 Days</td><td><span class="badge-emerald">MOMENTUM</span></td></tr>
+          <tr><td><strong>Dixcy Scott Trunk (Modenik)</strong></td><td>₹180</td><td style="color:#059669;font-weight:800;">16.5%</td><td>4 Days</td><td><span class="badge-emerald">HIGH VOLUME</span></td></tr>
+          <tr><td><strong>Dixcy Scott Brief (Modenik)</strong></td><td>₹130</td><td style="color:#2563eb;font-weight:800;">17.2%</td><td>4 Days</td><td><span class="badge-blue">STABLE</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="footer">© 2026 Modenik Lifestyle Pvt. Ltd. · Confidential Sales Decision Sheet · Generated ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+  </body>
+</html>`;
   };
 
-  const handleShareWhatsApp = () => {
+  const handleDownloadSlab = () => {
+    const html = getPdfHtml();
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!printWindow) return;
+    printWindow.document.write(html);
+    printWindow.document.close();
+    // Give time for styles to load, then trigger print-to-PDF
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      // Close the window after printing (user may cancel)
+      printWindow.onafterprint = () => printWindow.close();
+    }, 600);
+  };
+
+  const handleShareWhatsApp = async () => {
+    const html = getPdfHtml();
+    const blob = new Blob([html], { type: 'text/html' });
+    const fileName = `Modenik_Slab_${(distributorName || 'UP_DB').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    const file = new File([blob], fileName, { type: 'application/pdf' });
+
+    // Try native Web Share API (mobile browsers, including Chrome on Android)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `Modenik Slab Details — ${distributorName || 'UP DB'}`,
+          text: `Slab projection document for ${distributorName || 'UP DB'}. Target: Add ₹40L to unlock ₹2L extra incentive.`,
+        });
+        return;
+      } catch (_) {
+        // User cancelled or share failed — fall through to WhatsApp URL
+      }
+    }
+
+    // Fallback: download file first, then open WhatsApp with instructions
     handleDownloadSlab();
-    const message = `*Modenik Slab Details — ${distributorName || 'UP DB'}*\n\nI've shared the slab projection document for your account.\n\n📄 *File:* Modenik_Slab_${(distributorName || 'UP_DB').replace(/[^a-zA-Z0-9]/g, '_')}.html\n\n• Target Challenge: Add *₹40 L* primary order to unlock *₹2 L* extra incentive (2.0% Slab Unlock)\n• Current Selection: ${selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`} → ${currentProjection.base}\n• Replenishment: 4-day quick turnaround\n\n💡 *Tip:* Attach the downloaded .html file from your device above to this chat so you can open and review the full milestones.`;
+    const message = `*Modenik Slab Details — ${distributorName || 'UP DB'}*\n\n📄 Please find the Slab Projection PDF (just downloaded to your device). Attach it here.\n\n• Target Challenge: Add *₹40 L* bulk order → unlock *₹2 L* extra payout (2.0% Slab!)\n• Current Selection: ${selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`} → ${currentProjection.base}\n• 4-day replenishment turnaround\n\n_Generated by Modenik AI Sales Tool_`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };

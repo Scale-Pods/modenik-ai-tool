@@ -207,12 +207,15 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
         </div>
       </div>
 
-      {/* Real Map */}
-      <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style={{ height: '520px' }}>
+      {/* Real Map — isolated so Leaflet's internal z-indexes don't leak out */}
+      <div
+        className="relative w-full rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+        style={{ height: 'clamp(320px, 50vw, 520px)', isolation: 'isolate' }}
+      >
         <div ref={mapRef} className="w-full h-full" />
 
-        {/* Map Controls */}
-        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-1.5">
+        {/* Map Controls — inside isolated container, z-index is local */}
+        <div className="absolute top-4 right-4 z-[400] flex flex-col gap-1.5">
           <button
             type="button"
             onClick={() => mapInstance.current?.zoomIn()}
@@ -230,7 +233,7 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
         </div>
 
         {/* Map Legend */}
-        <div className="absolute bottom-4 left-4 z-[1000] glass-panel bg-white/90 backdrop-blur-md rounded-xl p-3 border border-slate-100 shadow-sm flex items-center gap-4">
+        <div className="absolute bottom-4 left-4 z-[400] glass-panel bg-white/90 backdrop-blur-md rounded-xl p-3 border border-slate-100 shadow-sm flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#10b981' }} />
             <span className="text-[9px] font-bold text-slate-500">Excellent</span>
@@ -246,8 +249,8 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
         </div>
       </div>
 
-      {/* ASM Cards Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* ASM Cards Strip — horizontal scroll on mobile, grid on larger screens */}
+      <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-3 overflow-x-auto pb-2 sm:overflow-visible sm:pb-0 -mx-1 px-1">
         {filteredASMs.map((asm) => {
           const isSelected = selectedAsm?.name === asm.name;
           return (
@@ -255,7 +258,7 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
               type="button"
               key={asm.name}
               onClick={() => setSelectedAsm(isSelected ? null : asm)}
-              className={`glass-panel rounded-xl p-4 border text-left transition-all cursor-pointer ${
+              className={`glass-panel rounded-xl p-4 border text-left transition-all cursor-pointer shrink-0 min-w-[160px] sm:min-w-0 ${
                 isSelected ? 'border-blue-400 shadow-md ring-1 ring-blue-200' : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
               }`}
             >

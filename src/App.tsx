@@ -423,9 +423,6 @@ export default function App() {
                 <ASMProfile onLogout={() => setIsLoggedIn(false)} />
               )}
               {activeScreen === 'profile' && role === 'Manager' && (
-                <ManagerProfile onLogout={() => setIsLoggedIn(false)} />
-              )}
-              {activeScreen === 'profile' && role === 'Manager' && (
                 <ManagerProfile 
                   onLogout={() => setIsLoggedIn(false)} 
                   onNavigateToMonthlyPlanner={() => setActiveScreen('monthly_planner')}

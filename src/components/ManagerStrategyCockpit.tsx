@@ -23,7 +23,15 @@ import {
   Database,
   Smartphone,
   Globe,
-  BarChart3
+  BarChart3,
+  Settings,
+  X,
+  Key,
+  Server,
+  User,
+  Lock,
+  AtSign,
+  Link
 } from 'lucide-react';
 
 type ConnectionStatus = 'connected' | 'disconnected' | 'syncing' | 'error';
@@ -44,6 +52,61 @@ export default function ManagerStrategyCockpit() {
   const [activeTab, setActiveTab] = useState<'phase2' | 'phase3'>('phase2');
   const [requestedForecast, setRequestedForecast] = useState(false);
 
+  const [configuringConnector, setConfiguringConnector] = useState<string | null>(null);
+  const [configValues, setConfigValues] = useState<Record<string, Record<string, string>>>({});
+
+  const openConfig = (id: string) => setConfiguringConnector(id);
+
+  const closeConfig = () => setConfiguringConnector(null);
+
+  const updateConfigValue = (connectorId: string, field: string, value: string) => {
+    setConfigValues(prev => ({
+      ...prev,
+      [connectorId]: { ...(prev[connectorId] || {}), [field]: value }
+    }));
+  };
+
+  const connectorConfigs: Record<string, { label: string; key: string; type: string; icon: React.ReactNode; placeholder: string }[]> = {
+    tally: [
+      { label: 'Server URL', key: 'serverUrl', type: 'text', icon: <Server className="w-4 h-4" />, placeholder: 'https://your-tally-server:9000' },
+      { label: 'Company Name', key: 'companyName', type: 'text', icon: <Building className="w-4 h-4" />, placeholder: 'Modenik Lifestyle Pvt Ltd' },
+      { label: 'Port', key: 'port', type: 'number', icon: <Link className="w-4 h-4" />, placeholder: '9000' },
+      { label: 'Username', key: 'username', type: 'text', icon: <User className="w-4 h-4" />, placeholder: 'admin' },
+      { label: 'Password', key: 'password', type: 'password', icon: <Lock className="w-4 h-4" />, placeholder: '••••••••' },
+    ],
+    sheets: [
+      { label: 'API Key', key: 'apiKey', type: 'password', icon: <Key className="w-4 h-4" />, placeholder: 'AIzaSy...' },
+      { label: 'Client Email', key: 'clientEmail', type: 'text', icon: <AtSign className="w-4 h-4" />, placeholder: 'service@modenik-sheets.iam.gserviceaccount.com' },
+      { label: 'Private Key', key: 'privateKey', type: 'password', icon: <Lock className="w-4 h-4" />, placeholder: '-----BEGIN PRIVATE KEY-----' },
+      { label: 'Default Sheet ID', key: 'sheetId', type: 'text', icon: <FileSpreadsheet className="w-4 h-4" />, placeholder: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms' },
+    ],
+    whatsapp: [
+      { label: 'Phone Number ID', key: 'phoneNumberId', type: 'text', icon: <MessageSquare className="w-4 h-4" />, placeholder: '123456789012345' },
+      { label: 'WhatsApp Business API Token', key: 'apiToken', type: 'password', icon: <Key className="w-4 h-4" />, placeholder: 'EAAT...' },
+      { label: 'Business Account ID', key: 'businessAccountId', type: 'text', icon: <User className="w-4 h-4" />, placeholder: '123456789012345' },
+      { label: 'Webhook Verification Token', key: 'webhookToken', type: 'password', icon: <Lock className="w-4 h-4" />, placeholder: 'your_verify_token' },
+    ],
+    sap: [
+      { label: 'SAP Server URL', key: 'serverUrl', type: 'text', icon: <Server className="w-4 h-4" />, placeholder: 'https://your-sap-instance:44300' },
+      { label: 'Client ID', key: 'clientId', type: 'text', icon: <User className="w-4 h-4" />, placeholder: 'SAP_CLIENT_001' },
+      { label: 'Client Secret', key: 'clientSecret', type: 'password', icon: <Lock className="w-4 h-4" />, placeholder: '••••••••' },
+      { label: 'System Number', key: 'systemNumber', type: 'text', icon: <Link className="w-4 h-4" />, placeholder: '00' },
+      { label: 'Gateway Host', key: 'gatewayHost', type: 'text', icon: <Server className="w-4 h-4" />, placeholder: 'gw.modernik.sap.internal' },
+    ],
+    email: [
+      { label: 'SMTP Host', key: 'smtpHost', type: 'text', icon: <Server className="w-4 h-4" />, placeholder: 'smtp.gmail.com' },
+      { label: 'SMTP Port', key: 'smtpPort', type: 'number', icon: <Link className="w-4 h-4" />, placeholder: '587' },
+      { label: 'Email Address', key: 'email', type: 'text', icon: <AtSign className="w-4 h-4" />, placeholder: 'reports@modenik.in' },
+      { label: 'App Password', key: 'appPassword', type: 'password', icon: <Key className="w-4 h-4" />, placeholder: 'xxxx xxxx xxxx xxxx' },
+    ],
+    mobile: [
+      { label: 'API Base URL', key: 'apiUrl', type: 'text', icon: <Server className="w-4 h-4" />, placeholder: 'https://api.modenik-mobile.in/v1' },
+      { label: 'App Key', key: 'appKey', type: 'password', icon: <Key className="w-4 h-4" />, placeholder: 'mk_live_...' },
+      { label: 'Organization ID', key: 'orgId', type: 'text', icon: <Building className="w-4 h-4" />, placeholder: 'org_modenik_east' },
+      { label: 'API Secret', key: 'apiSecret', type: 'password', icon: <Lock className="w-4 h-4" />, placeholder: '••••••••' },
+    ],
+  };
+
   const [connectors, setConnectors] = useState<Connector[]>([
     {
       id: 'tally',
@@ -55,8 +118,8 @@ export default function ManagerStrategyCockpit() {
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50 border-emerald-100',
       actions: [
+        { label: 'Configure', action: () => openConfig('tally') },
         { label: 'Sync Now', action: () => triggerSync('tally') },
-        { label: 'View Ledger', action: () => {} }
       ]
     },
     {
@@ -69,8 +132,8 @@ export default function ManagerStrategyCockpit() {
       color: 'text-green-600',
       bgColor: 'bg-green-50 border-green-100',
       actions: [
+        { label: 'Configure', action: () => openConfig('sheets') },
         { label: 'Export Data', action: () => {} },
-        { label: 'Open Sheet', action: () => {} }
       ]
     },
     {
@@ -83,8 +146,8 @@ export default function ManagerStrategyCockpit() {
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50 border-emerald-100',
       actions: [
+        { label: 'Configure', action: () => openConfig('whatsapp') },
         { label: 'Send Broadcast', action: () => {} },
-        { label: 'View History', action: () => {} }
       ]
     },
     {
@@ -97,8 +160,8 @@ export default function ManagerStrategyCockpit() {
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 border-blue-100',
       actions: [
+        { label: 'Configure', action: () => openConfig('sap') },
         { label: 'Sync Ledger', action: () => {} },
-        { label: 'Reconcile', action: () => {} }
       ]
     },
     {
@@ -111,8 +174,8 @@ export default function ManagerStrategyCockpit() {
       color: 'text-red-600',
       bgColor: 'bg-red-50 border-red-100',
       actions: [
+        { label: 'Configure', action: () => openConfig('email') },
         { label: 'Send Report', action: () => {} },
-        { label: '模板管理', action: () => {} }
       ]
     },
     {
@@ -125,8 +188,8 @@ export default function ManagerStrategyCockpit() {
       color: 'text-indigo-600',
       bgColor: 'bg-indigo-50 border-indigo-100',
       actions: [
+        { label: 'Configure', action: () => openConfig('mobile') },
         { label: 'Push Update', action: () => {} },
-        { label: 'View Logs', action: () => {} }
       ]
     }
   ]);
@@ -322,7 +385,7 @@ export default function ManagerStrategyCockpit() {
                           onClick={action.action}
                           className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-[9px] hover:bg-slate-50 transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          {idx === 0 ? <RefreshCw className="w-3 h-3" /> : <ExternalLink className="w-3 h-3" />}
+                          {action.label === 'Configure' ? <Settings className="w-3 h-3" /> : idx === 0 ? <RefreshCw className="w-3 h-3" /> : <ExternalLink className="w-3 h-3" />}
                           <span>{action.label}</span>
                         </button>
                       ))}
@@ -534,6 +597,93 @@ export default function ManagerStrategyCockpit() {
               )}
             </AnimatePresence>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Connector Configuration Modal */}
+      <AnimatePresence>
+        {configuringConnector && (
+          <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeConfig}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl z-10"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 shrink-0">
+                    <Settings className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 tracking-tight">
+                      Configure {connectors.find(c => c.id === configuringConnector)?.name}
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-semibold">Enter your API credentials and connection details</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeConfig}
+                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body - Config Fields */}
+              <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                {(connectorConfigs[configuringConnector] || []).map((field) => (
+                  <div key={field.key}>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">
+                      {field.label}
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                        {field.icon}
+                      </div>
+                      <input
+                        type={field.type}
+                        value={configValues[configuringConnector]?.[field.key] || ''}
+                        onChange={(e) => updateConfigValue(configuringConnector, field.key, e.target.value)}
+                        placeholder={field.placeholder}
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all placeholder:text-slate-400"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={closeConfig}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold text-xs hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeConfig();
+                    // Simulate saving - could connect to real backend
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-all shadow-sm cursor-pointer"
+                >
+                  Save & Connect
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
