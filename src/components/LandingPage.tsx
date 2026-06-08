@@ -23,9 +23,12 @@ export default function LandingPage({ onEnterDashboard }: LandingPageProps) {
   return (
     <div className="min-h-screen bg-slate-50 relative overflow-hidden flex flex-col selection:bg-red-200">
       
-      {/* Decorative Blur Orbs */}
-      <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Animated Gradient Orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[100px] animate-gradient" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px] animate-gradient" style={{ animationDelay: '-4s' }} />
+        <div className="absolute top-[40%] left-[30%] w-[400px] h-[400px] bg-indigo-500/8 rounded-full blur-[90px] animate-gradient" style={{ animationDelay: '-8s' }} />
+      </div>
 
       {/* Navigation Header */}
       <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between z-10 shrink-0">

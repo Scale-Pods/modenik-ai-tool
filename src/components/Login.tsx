@@ -42,15 +42,21 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-6 overflow-hidden bg-slate-50 selection:bg-blue-200">
       
-      {/* Parallax Atmospheric Bleed Blobs */}
-      <div 
-        className="floating-orb w-[600px] h-[600px] bg-blue-600/10 top-[-15%] right-[-10%]"
-        style={{ transform: `translate(${coords.x}px, ${coords.y}px)` }}
-      />
-      <div 
-        className="floating-orb w-[500px] h-[500px] bg-slate-900/5 bottom-[-10%] left-[-10%]"
-        style={{ transform: `translate(${-coords.x}px, ${-coords.y}px)` }}
-      />
+      {/* Animated Gradient Orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div 
+          className="floating-orb w-[600px] h-[600px] bg-blue-600/10 top-[-15%] right-[-10%] animate-gradient"
+          style={{ transform: `translate(${coords.x}px, ${coords.y}px)` }}
+        />
+        <div 
+          className="floating-orb w-[500px] h-[500px] bg-slate-900/5 bottom-[-10%] left-[-10%] animate-gradient"
+          style={{ transform: `translate(${-coords.x}px, ${-coords.y}px)`, animationDelay: '-4s' }}
+        />
+        <div 
+          className="floating-orb w-[400px] h-[400px] bg-indigo-500/8 top-[30%] left-[50%] animate-gradient"
+          style={{ animationDelay: '-8s' }}
+        />
+      </div>
 
       {/* Main Glass Login Card */}
       <motion.div 

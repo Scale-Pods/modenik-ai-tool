@@ -1,41 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   MapPin,
   Navigation,
   ChevronRight,
-  Target,
-  Users,
-  TrendingUp,
-  IndianRupee,
   X,
-  Phone,
-  Mail,
   Layers,
-  Maximize2,
-  Crosshair
+  Crosshair,
+  ZoomIn,
+  ZoomOut
 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ASMLeaderboard } from '../data';
 import { ASMLeaderboardEntry } from '../types';
 
-function FitBounds({ asms }: { asms: ASMLeaderboardEntry[] }) {
-  const map = useMap();
-  if (asms.length > 0) {
-    const bounds = L.latLngBounds(asms.map(a => [a.lat, a.lng] as [number, number]));
-    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 8 });
-  }
-  return null;
-}
-
 interface ASMMapPageProps {
   searchFilter: string;
 }
 
+const createColoredIcon = (color: string) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="${color}" stroke="white" stroke-width="1.5"/>
+    <circle cx="12" cy="9" r="3" fill="white"/>
+  </svg>`;
+  return L.divIcon({
+    html: svg,
+    className: '',
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36],
+  });
+};
+
 export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
   const [selectedAsm, setSelectedAsm] = useState<ASMLeaderboardEntry | null>(null);
+  const [mapReady, setMapReady] = useState(false);
   const [mapStyle, setMapStyle] = useState<'streets' | 'satellite'>('streets');
 
   const filteredASMs = ASMLeaderboard.filter(m =>
@@ -43,14 +46,6 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
     m.state.toLowerCase().includes(searchFilter.toLowerCase()) ||
     m.region.toLowerCase().includes(searchFilter.toLowerCase())
   );
-
-  const tileUrl = mapStyle === 'streets'
-    ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-    : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-
-  const tileAttribution = mapStyle === 'streets'
-    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    : '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye';
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,6 +64,104 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
       default: return 'bg-slate-100 text-slate-600';
     }
   };
+
+  // Initialize map once
+  useEffect(() => {
+    if (!mapRef.current || mapInstance.current) return;
+
+    const map = L.map(mapRef.current, {
+      center: [23.5, 86.5],
+      zoom: 6.5,
+      zoomControl: false,
+      scrollWheelZoom: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    }).addTo(map);
+
+    mapInstance.current = map;
+    setMapReady(true);
+
+    return () => {
+      map.remove();
+      mapInstance.current = null;
+    };
+  }, []);
+
+  // Switch tile layers when map style changes
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map) return;
+
+    map.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) {
+        map.removeLayer(layer);
+      }
+    });
+
+    const url = mapStyle === 'streets'
+      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+
+    const attr = mapStyle === 'streets'
+      ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+      : '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye';
+
+    L.tileLayer(url, { attribution: attr }).addTo(map);
+  }, [mapStyle]);
+
+  // Update markers when filtered ASMs change
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map || !mapReady) return;
+
+    markersRef.current.forEach(m => m.remove());
+    markersRef.current = [];
+
+    const bounds = L.latLngBounds(filteredASMs.map(a => [a.lat, a.lng] as [number, number]));
+
+    filteredASMs.forEach((asm) => {
+      const marker = L.marker([asm.lat, asm.lng], {
+        icon: createColoredIcon(getStatusColor(asm.status)),
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div style="min-width:200px;font-family:Inter,sans-serif;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:900;background:${getStatusColor(asm.status)};">
+              ${asm.initials}
+            </div>
+            <div>
+              <p style="margin:0;font-size:12px;font-weight:900;color:#0f172a;">${asm.name}</p>
+              <p style="margin:0;font-size:9px;color:#64748b;font-weight:600;">${asm.region}, ${asm.state}</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:10px;">
+            <span style="color:#94a3b8;font-weight:600;">Achievement</span>
+            <span style="text-align:right;font-weight:800;color:#0f172a;">${asm.ach}%</span>
+            <span style="color:#94a3b8;font-weight:600;">Target</span>
+            <span style="text-align:right;font-weight:800;color:#0f172a;">${asm.targetPrimary}</span>
+            <span style="color:#94a3b8;font-weight:600;">Slab Upside</span>
+            <span style="text-align:right;font-weight:800;color:#ea580c;">${asm.upside}</span>
+            <span style="color:#94a3b8;font-weight:600;">Status</span>
+            <span style="text-align:right;font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;background:${
+              asm.status === 'EXCELLENT' ? '#d1fae5' : asm.status === 'ON TRACK' ? '#dbeafe' : '#fee2e2'
+            };color:${
+              asm.status === 'EXCELLENT' ? '#065f46' : asm.status === 'ON TRACK' ? '#1e40af' : '#991b1b'
+            };">${asm.status}</span>
+          </div>
+        </div>
+      `);
+
+      marker.on('click', () => setSelectedAsm(asm));
+      markersRef.current.push(marker);
+    });
+
+    if (filteredASMs.length > 0) {
+      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 8 });
+    }
+  }, [filteredASMs, mapReady]);
 
   return (
     <motion.div
@@ -115,67 +208,25 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
       </div>
 
       {/* Real Map */}
-      <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style={{ height: '520px', zIndex: 1 }}>
-        <MapContainer
-          center={[23.5, 86.5]}
-          zoom={6.5}
-          scrollWheelZoom={true}
-          className="w-full h-full"
-          zoomControl={false}
-        >
-          <TileLayer
-            url={tileUrl}
-            attribution={tileAttribution}
-          />
-          <FitBounds asms={filteredASMs} />
+      <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style={{ height: '520px' }}>
+        <div ref={mapRef} className="w-full h-full" />
 
-          {filteredASMs.map((asm) => (
-            <Marker
-              key={asm.name}
-              position={[asm.lat, asm.lng]}
-              icon={createColoredIcon(getStatusColor(asm.status))}
-              eventHandlers={{
-                click: () => setSelectedAsm(asm),
-              }}
-            >
-              <Popup>
-                <div className="text-left" style={{ minWidth: '200px' }}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-black`}
-                      style={{ backgroundColor: getStatusColor(asm.status) }}>
-                      {asm.initials}
-                    </div>
-                    <div>
-                      <p className="text-xs font-black text-slate-900">{asm.name}</p>
-                      <p className="text-[9px] text-slate-500 font-semibold">{asm.region}, {asm.state}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                    <span className="text-slate-400 font-semibold">Achievement</span>
-                    <span className="text-right font-bold text-slate-900">{asm.ach}%</span>
-                    <span className="text-slate-400 font-semibold">Target</span>
-                    <span className="text-right font-bold text-slate-900">{asm.targetPrimary}</span>
-                    <span className="text-slate-400 font-semibold">Slab Upside</span>
-                    <span className="text-right font-bold text-orange-600">{asm.upside}</span>
-                    <span className="text-slate-400 font-semibold">Status</span>
-                    <span className={`text-right text-[9px] font-bold px-1.5 py-0.5 rounded ${getStatusLabel(asm.status)}`}>
-                      {asm.status}
-                    </span>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-
-        {/* Map Controls Overlay */}
-        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
-          <div className="glass-panel bg-white/90 backdrop-blur-md rounded-xl p-2 border border-slate-100 shadow-sm flex flex-col gap-1">
-            <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 cursor-pointer" title="Zoom In"
-              onClick={() => document.querySelector('.leaflet-control-zoom-in')?.dispatchEvent(new MouseEvent('click'))}>
-              <Maximize2 className="w-4 h-4" />
-            </button>
-          </div>
+        {/* Map Controls */}
+        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-1.5">
+          <button
+            type="button"
+            onClick={() => mapInstance.current?.zoomIn()}
+            className="glass-panel bg-white/90 backdrop-blur-md rounded-xl p-2 border border-slate-100 shadow-sm hover:bg-white cursor-pointer"
+          >
+            <ZoomIn className="w-4 h-4 text-slate-600" />
+          </button>
+          <button
+            type="button"
+            onClick={() => mapInstance.current?.zoomOut()}
+            className="glass-panel bg-white/90 backdrop-blur-md rounded-xl p-2 border border-slate-100 shadow-sm hover:bg-white cursor-pointer"
+          >
+            <ZoomOut className="w-4 h-4 text-slate-600" />
+          </button>
         </div>
 
         {/* Map Legend */}

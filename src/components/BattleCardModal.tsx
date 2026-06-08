@@ -58,10 +58,9 @@ export default function BattleCardModal({
     }, 1500);
   };
 
-  const handleDownloadSlab = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    printWindow.document.write(`
+  const buildSlabHTML = () => {
+    const selectedLabel = selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`;
+    return `
       <html>
         <head>
           <title>Modenik Slab Details - ${distributorName || 'UP DB'}</title>
@@ -82,11 +81,9 @@ export default function BattleCardModal({
         </head>
         <body>
           <h1>Modenik Lifestyle - Distributor Slab Projections</h1>
-          
           <div class="section">
             <div class="label">Distributor Account</div>
             <div style="font-size: 16px; font-weight: bold; margin-top: 4px;">${distributorName || 'UP DB (1004821)'}</div>
-            
             <div class="highlight">
               <span class="label" style="color: #991b1b;">Active Challenge Milestone</span>
               <p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 600; color: #7f1d1d;">
@@ -94,42 +91,44 @@ export default function BattleCardModal({
               </p>
             </div>
           </div>
-
           <div class="section">
-            <div class="label">Projected Milestone Slab Targets</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Bulk Order Addition</th>
-                  <th>Projected Total Payout</th>
-                  <th>Multiplier Level</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>None (Current Base)</td>
-                  <td>₹5.7 Lakhs</td>
-                  <td>Base earnings rate</td>
-                </tr>
-                <tr>
-                  <td>+₹15 Lakhs</td>
-                  <td>₹6.1 Lakhs</td>
-                  <td>1.1x Active Tier</td>
-                </tr>
-                <tr>
-                  <td>+₹30 Lakhs</td>
-                  <td>₹6.7 Lakhs</td>
-                  <td>1.25x High Tier</td>
-                </tr>
-                <tr style="background-color: #fef2f2; font-weight: bold;">
-                  <td>+₹40 Lakhs (Target)</td>
-                  <td>₹7.7 Lakhs</td>
-                  <td style="color: #dc2626;">2.0% Peak Slab Unlock ⚡</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="label">Selected Projection: ${selectedLabel}</div>
+            <div class="payout">${currentProjection.base}</div>
+            <div style="margin-top: 20px;">
+              <div class="label">Projected Milestone Slab Targets</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bulk Order Addition</th>
+                    <th>Projected Total Payout</th>
+                    <th>Multiplier Level</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>None (Current Base)</td>
+                    <td>₹5.7 Lakhs</td>
+                    <td>Base earnings rate</td>
+                  </tr>
+                  <tr>
+                    <td>+₹15 Lakhs</td>
+                    <td>₹6.1 Lakhs</td>
+                    <td>1.1x Active Tier</td>
+                  </tr>
+                  <tr>
+                    <td>+₹30 Lakhs</td>
+                    <td>₹6.7 Lakhs</td>
+                    <td>1.25x High Tier</td>
+                  </tr>
+                  <tr style="background-color: #fef2f2; font-weight: bold;">
+                    <td>+₹40 Lakhs (Target)</td>
+                    <td>₹7.7 Lakhs</td>
+                    <td style="color: #dc2626;">2.0% Peak Slab Unlock ⚡</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-
           <div class="section">
             <div class="label">Product Line Analysis (Estimated ROI)</div>
             <table>
@@ -167,29 +166,30 @@ export default function BattleCardModal({
               </tbody>
             </table>
           </div>
-          
           <div style="font-size: 11px; text-align: center; color: #94a3b8; margin-top: 50px; border-t: 1px solid #e2e8f0; padding-top: 15px;">
             &copy; 2026 Modenik Lifestyle. Confidential Sales Decision Sheet.
           </div>
-
-          <script>
-            window.onload = function() {
-              window.print();
-              setTimeout(function() { window.close(); }, 500);
-            };
-          </script>
         </body>
       </html>
-    `);
-    printWindow.document.close();
+    `;
+  };
+
+  const handleDownloadSlab = () => {
+    const html = buildSlabHTML();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Modenik_Slab_${(distributorName || 'UP_DB').replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleShareWhatsApp = () => {
-    // Trigger PDF download first
     handleDownloadSlab();
-    
-    // Open WhatsApp with document reference message
-    const message = `*Modenik Slab Details for ${distributorName || 'UP DB'}*:\n\nHi! I have generated the official Slab Projections PDF for your account. Please find the document downloaded on your device, and you can attach it here to review the milestones.`;
+    const message = `*Modenik Slab Details — ${distributorName || 'UP DB'}*\n\nI've shared the slab projection document for your account.\n\n📄 *File:* Modenik_Slab_${(distributorName || 'UP_DB').replace(/[^a-zA-Z0-9]/g, '_')}.html\n\n• Target Challenge: Add *₹40 L* primary order to unlock *₹2 L* extra incentive (2.0% Slab Unlock)\n• Current Selection: ${selectedAddition === 0 ? 'None' : `+₹${selectedAddition} L`} → ${currentProjection.base}\n• Replenishment: 4-day quick turnaround\n\n💡 *Tip:* Attach the downloaded .html file from your device above to this chat so you can open and review the full milestones.`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -287,7 +287,12 @@ export default function BattleCardModal({
               </p>
 
               <div className="grid grid-cols-4 gap-2.5">
-                {[0, 15, 30, 40].map((amt) => {
+                {[
+                  { amt: 0, label: 'None', color: 'bg-slate-200 text-slate-700 border-slate-300 hover:bg-slate-300' },
+                  { amt: 15, label: '+₹15 L', color: 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200' },
+                  { amt: 30, label: '+₹30 L', color: 'bg-indigo-100 text-indigo-800 border-indigo-200 hover:bg-indigo-200' },
+                  { amt: 40, label: '+₹40 L', color: 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200' },
+                ].map(({ amt, label, color }) => {
                   const isActive = selectedAddition === amt;
                   return (
                     <button
@@ -296,11 +301,11 @@ export default function BattleCardModal({
                       onClick={() => setSelectedAddition(amt as 0 | 15 | 30 | 40)}
                       className={`py-3.5 px-2 rounded-xl text-xs font-black transition-all border text-center cursor-pointer ${
                         isActive
-                          ? 'bg-blue-700 text-white border-blue-700 shadow-lg shadow-blue-700/10'
-                          : 'bg-slate-50/50 text-slate-700 border-slate-200/60 hover:bg-slate-100'
+                          ? 'bg-blue-700 text-white border-blue-700 shadow-lg shadow-blue-700/10 scale-105'
+                          : `${color} shadow-sm`
                       }`}
                     >
-                      {amt === 0 ? 'None' : `+₹${amt} L`}
+                      {label}
                     </button>
                   );
                 })}
