@@ -24,6 +24,8 @@ import SupportModal from './components/SupportModal';
 import ManagerAnalyticsHub from './components/ManagerAnalyticsHub';
 import ManagerReviewPlanner from './components/ManagerReviewPlanner';
 import ManagerStrategyCockpit from './components/ManagerStrategyCockpit';
+import ASMMapPage from './components/ASMMapPage';
+import MonthlyPlanner from './components/MonthlyPlanner';
 
 export default function App() {
   const [showLanding, setShowLanding] = useState<boolean>(true);
@@ -131,6 +133,7 @@ export default function App() {
                 <ManagerCockpit 
                   searchFilter={searchQuery}
                   onNavigateToReports={() => setActiveScreen('phase23')}
+                  onNavigateToMap={() => setActiveScreen('asm_map')}
                 />
               )}
 
@@ -296,12 +299,32 @@ export default function App() {
                 <ManagerStrategyCockpit />
               )}
 
-              {/* SCREEN 5: Separated Role Profile Pages */}
+              {/* SCREEN 5: ASM Territory Map (Manager only) */}
+              {activeScreen === 'asm_map' && role === 'Manager' && (
+                <ASMMapPage searchFilter={searchQuery} />
+              )}
+
+              {/* SCREEN 6: Separated Role Profile Pages */}
               {activeScreen === 'profile' && role === 'ASM' && (
                 <ASMProfile onLogout={() => setIsLoggedIn(false)} />
               )}
               {activeScreen === 'profile' && role === 'Manager' && (
                 <ManagerProfile onLogout={() => setIsLoggedIn(false)} />
+              )}
+              {activeScreen === 'profile' && role === 'Manager' && (
+                <ManagerProfile 
+                  onLogout={() => setIsLoggedIn(false)} 
+                  onNavigateToMonthlyPlanner={() => setActiveScreen('monthly_planner')}
+                />
+              )}
+
+              {/* SCREEN 6: Monthly Planner calendar grid views */}
+              {activeScreen === 'monthly_planner' && (
+                <MonthlyPlanner 
+                  role={role}
+                  onNavigateToWeekly={() => setActiveScreen('planner')}
+                  onBackToProfile={() => setActiveScreen('profile')}
+                />
               )}
             </motion.div>
           </AnimatePresence>

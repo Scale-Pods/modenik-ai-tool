@@ -11,14 +11,16 @@ import {
   Sparkles,
   Settings,
   ChevronRight,
-  TrendingUp
+  TrendingUp,
+  CalendarDays
 } from 'lucide-react';
 
 interface ManagerProfileProps {
   onLogout: () => void;
+  onNavigateToMonthlyPlanner: () => void;
 }
 
-export default function ManagerProfile({ onLogout }: ManagerProfileProps) {
+export default function ManagerProfile({ onLogout, onNavigateToMonthlyPlanner }: ManagerProfileProps) {
   const [allowOverdraft, setAllowOverdraft] = useState(true);
   const [primaryTargetCap, setPrimaryTargetCap] = useState(110); // in percent
 
@@ -92,6 +94,27 @@ export default function ManagerProfile({ onLogout }: ManagerProfileProps) {
                 <span className="flex items-center gap-2 text-slate-455"><Award className="w-4 h-4 text-slate-400" /> Branch Rank</span>
                 <span className="bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded text-[10px]">Rank #2 nationally</span>
               </div>
+            </div>
+
+            {/* Monthly Planner Access Card */}
+            <div className="glass-panel p-5 rounded-3xl text-left border border-slate-100/80 space-y-4 w-full">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-indigo-50 text-indigo-700 rounded-xl">
+                  <CalendarDays className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900 uppercase">Monthly Branch GTM Planner</h4>
+                  <p className="text-[10px] text-slate-500 font-semibold">Track regional joint audits calendar</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onNavigateToMonthlyPlanner}
+                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-[11px] rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <span>Access Monthly Calendar</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </section>

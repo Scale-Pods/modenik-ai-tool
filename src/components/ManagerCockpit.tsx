@@ -13,17 +13,22 @@ import {
   Compass, 
   ArrowRight,
   TrendingUpIcon,
-  Crown
+  Crown,
+  MapPin
 } from 'lucide-react';
 import { ASMLeaderboard } from '../data';
+import { ASMLeaderboardEntry } from '../types';
+import ASMLeaderboardModal from './ASMLeaderboardModal';
 
 interface ManagerCockpitProps {
   searchFilter: string;
   onNavigateToReports?: () => void;
+  onNavigateToMap?: () => void;
 }
 
-export default function ManagerCockpit({ searchFilter, onNavigateToReports }: ManagerCockpitProps) {
+export default function ManagerCockpit({ searchFilter, onNavigateToReports, onNavigateToMap }: ManagerCockpitProps) {
   const [hoveredLeader, setHoveredLeader] = useState<number | null>(null);
+  const [selectedMember, setSelectedMember] = useState<ASMLeaderboardEntry | null>(null);
 
   const statesGrowth = [
     { name: 'Odisha', value: '+12.4%', percentage: 85, color: 'bg-emerald-600' },
@@ -144,14 +149,24 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports }: Ma
         <div className="lg:col-span-2 glass-panel rounded-2xl overflow-hidden flex flex-col">
           <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white/40 select-none">
             <h3 className="text-base font-black text-slate-955 tracking-tight">ASM Leaderboard</h3>
-            <button 
-              type="button"
-              onClick={onNavigateToReports}
-              className="text-blue-700 font-bold text-xs flex items-center gap-1 hover:underline cursor-pointer"
-            >
-              <span>View Detailed Reports</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                type="button"
+                onClick={onNavigateToMap}
+                className="text-blue-700 font-bold text-xs flex items-center gap-1 hover:underline cursor-pointer"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>Track on Map</span>
+              </button>
+              <button 
+                type="button"
+                onClick={onNavigateToReports}
+                className="text-blue-700 font-bold text-xs flex items-center gap-1 hover:underline cursor-pointer"
+              >
+                <span>View Detailed Reports</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -179,7 +194,8 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports }: Ma
                       key={member.name}
                       onMouseEnter={() => setHoveredLeader(index)}
                       onMouseLeave={() => setHoveredLeader(null)}
-                      className="hover:bg-slate-50/50 transition-colors"
+                      onClick={() => setSelectedMember(member)}
+                      className="hover:bg-slate-50/50 transition-colors cursor-pointer"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -272,6 +288,12 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports }: Ma
           </div>
         </div>
       </div>
+      {/* ASM Detail Modal */}
+      <ASMLeaderboardModal
+        isOpen={!!selectedMember}
+        onClose={() => setSelectedMember(null)}
+        member={selectedMember}
+      />
     </motion.div>
   );
 }

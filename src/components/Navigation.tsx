@@ -13,7 +13,8 @@ import {
   LogOut,
   Sparkles,
   Menu,
-  X
+  X,
+  MapPin
 } from 'lucide-react';
 import { Role, Screen } from '../types';
 import Logo from './Logo';
@@ -54,6 +55,7 @@ export default function Navigation({
     { id: 'dashboard' as Screen, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'distributors' as Screen, label: 'Analytics Hub', icon: Users },
     { id: 'planner' as Screen, label: 'Joint Audits', icon: CalendarDays },
+    { id: 'asm_map' as Screen, label: 'ASM Map', icon: MapPin },
     { id: 'phase23' as Screen, label: 'Strategy Cockpit', icon: Rocket, isFuture: true },
   ];
 

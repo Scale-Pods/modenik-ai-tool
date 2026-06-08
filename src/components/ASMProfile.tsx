@@ -9,14 +9,17 @@ import {
   ShieldCheck, 
   Briefcase, 
   Award,
-  Sparkles
+  Sparkles,
+  CalendarDays,
+  ChevronRight
 } from 'lucide-react';
 
 interface ASMProfileProps {
   onLogout: () => void;
+  onNavigateToMonthlyPlanner: () => void;
 }
 
-export default function ASMProfile({ onLogout }: ASMProfileProps) {
+export default function ASMProfile({ onLogout, onNavigateToMonthlyPlanner }: ASMProfileProps) {
   const [selectedDistributor, setSelectedDistributor] = useState<'UP_DB' | 'NAGAR_DB' | 'BIHAR_DB' | 'APTL_DB'>('UP_DB');
   const [additionalPrimary, setAdditionalPrimary] = useState<number>(15); // in Lakhs
 
@@ -107,6 +110,27 @@ export default function ASMProfile({ onLogout }: ASMProfileProps) {
                 <span className="flex items-center gap-2 text-slate-455"><Award className="w-4 h-4 text-slate-400" /> Commission Slab</span>
                 <span className="bg-blue-50 text-blue-700 font-extrabold px-2.5 py-0.5 rounded text-[10px]">Tier A Achiever</span>
               </div>
+            </div>
+
+            {/* Monthly Planner Access Card */}
+            <div className="glass-panel p-5 rounded-3xl text-left border border-slate-100/80 space-y-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-blue-50 text-blue-700 rounded-xl">
+                  <CalendarDays className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900 uppercase">Monthly Visit GTM Planner</h4>
+                  <p className="text-[10px] text-slate-500 font-semibold">Track month-level distributor coverage</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onNavigateToMonthlyPlanner}
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-[11px] rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <span>Access Monthly Calendar</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </section>
