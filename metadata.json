@@ -1,0 +1,6 @@
+{
+  "name": "Modenik AI",
+  "description": "Decision intelligence dashboard for sales leaders, tracking ASM performance, distributor health, secondary sales, and AI-enabled battle cards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
