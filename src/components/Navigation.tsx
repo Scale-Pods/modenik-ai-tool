@@ -87,10 +87,21 @@ export default function Navigation({
               </span>
             )}
           </div>
+          <div className={`flex items-center gap-2 ${isHovered ? 'pl-1 justify-start' : 'justify-center'}`}>
+            {isHovered && (
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                {role === 'ASM' ? 'Sales Assistant' : 'Sales Intelligence'}
+              </p>
+            )}
+            {!isHovered && (
+              <img src="/assets/ScalePods-logo.png" alt="SP" className="h-6 w-auto opacity-50" />
+            )}
+          </div>
           {isHovered && (
-            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest pl-1">
-              {role === 'ASM' ? 'Sales Assistant' : 'Sales Intelligence'}
-            </p>
+            <div className="flex items-center gap-2 pl-1 pt-1">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Powered by</span>
+              <img src="/assets/ScalePods-logo.png" alt="ScalePods" className="h-6 w-auto" />
+            </div>
           )}
         </div>
 

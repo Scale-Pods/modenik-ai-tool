@@ -10,10 +10,25 @@ import {
   IndianRupee,
   X,
   Phone,
-  Mail
+  Mail,
+  Layers,
+  Maximize2,
+  Crosshair
 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { ASMLeaderboard } from '../data';
 import { ASMLeaderboardEntry } from '../types';
+
+function FitBounds({ asms }: { asms: ASMLeaderboardEntry[] }) {
+  const map = useMap();
+  if (asms.length > 0) {
+    const bounds = L.latLngBounds(asms.map(a => [a.lat, a.lng] as [number, number]));
+    map.fitBounds(bounds, { padding: [60, 60], maxZoom: 8 });
+  }
+  return null;
+}
 
 interface ASMMapPageProps {
   searchFilter: string;
@@ -21,6 +36,7 @@ interface ASMMapPageProps {
 
 export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
   const [selectedAsm, setSelectedAsm] = useState<ASMLeaderboardEntry | null>(null);
+  const [mapStyle, setMapStyle] = useState<'streets' | 'satellite'>('streets');
 
   const filteredASMs = ASMLeaderboard.filter(m =>
     m.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
@@ -28,32 +44,29 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
     m.region.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
-  // Map bounds for East India focus
-  const bounds = {
-    minLat: 19.5,
-    maxLat: 27.5,
-    minLng: 84.0,
-    maxLng: 89.5
-  };
+  const tileUrl = mapStyle === 'streets'
+    ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
-  const toX = (lng: number) => ((lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
-  const toY = (lat: number) => ((bounds.maxLat - lat) / (bounds.maxLat - bounds.minLat)) * 100;
+  const tileAttribution = mapStyle === 'streets'
+    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    : '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye';
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'EXCELLENT': return 'bg-emerald-500';
-      case 'ON TRACK': return 'bg-blue-600';
-      case 'CRITICAL': return 'bg-red-600';
-      default: return 'bg-slate-400';
+      case 'EXCELLENT': return '#10b981';
+      case 'ON TRACK': return '#2563eb';
+      case 'CRITICAL': return '#dc2626';
+      default: return '#94a3b8';
     }
   };
 
-  const getStatusRing = (status: string) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'EXCELLENT': return 'ring-emerald-400';
-      case 'ON TRACK': return 'ring-blue-400';
-      case 'CRITICAL': return 'ring-red-400';
-      default: return 'ring-slate-300';
+      case 'EXCELLENT': return 'bg-emerald-100 text-emerald-700';
+      case 'ON TRACK': return 'bg-blue-100 text-blue-700';
+      case 'CRITICAL': return 'bg-red-100 text-red-700';
+      default: return 'bg-slate-100 text-slate-600';
     }
   };
 
@@ -64,99 +77,121 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
       className="space-y-6 text-left"
     >
       {/* Header */}
-      <div>
-        <nav className="flex items-center gap-1.5 text-slate-500 font-semibold text-xs mb-1.5">
-          <span>Region</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-secondary font-bold">East Branch</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-secondary font-bold">ASM Field Map</span>
-        </nav>
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight">ASM Territory Map</h2>
-        <p className="text-sm font-semibold text-slate-500">Real-time field tracking · {filteredASMs.length} ASMs deployed</p>
-      </div>
-
-      {/* Map Container */}
-      <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200 bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/30 shadow-sm" style={{ height: '520px' }}>
-        {/* Grid lines */}
-        <div className="absolute inset-0 opacity-[0.04]">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={`h-${i}`} className="absolute left-0 right-0 border-t border-slate-900" style={{ top: `${(i + 1) * 12.5}%` }} />
-          ))}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={`v-${i}`} className="absolute top-0 bottom-0 border-l border-slate-900" style={{ left: `${(i + 1) * 12.5}%` }} />
-          ))}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <nav className="flex items-center gap-1.5 text-slate-500 font-semibold text-xs mb-1.5">
+            <span>Region</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-secondary font-bold">East Branch</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-secondary font-bold">ASM Field Map</span>
+          </nav>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">ASM Territory Map</h2>
+          <p className="text-sm font-semibold text-slate-500">Real-time field tracking · {filteredASMs.length} ASMs deployed</p>
         </div>
 
-        {/* State labels */}
-        <span className="absolute text-[10px] font-bold text-slate-300 uppercase select-none" style={{ top: '22%', left: '30%' }}>Bihar</span>
-        <span className="absolute text-[10px] font-bold text-slate-300 uppercase select-none" style={{ top: '62%', left: '18%' }}>Odisha</span>
-        <span className="absolute text-[10px] font-bold text-slate-300 uppercase select-none" style={{ top: '18%', left: '68%' }}>West Bengal</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMapStyle('streets')}
+            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              mapStyle === 'streets' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>Streets</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapStyle('satellite')}
+            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              mapStyle === 'satellite' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <Crosshair className="w-3.5 h-3.5" />
+            <span>Satellite</span>
+          </button>
+        </div>
+      </div>
 
-        {/* City labels */}
-        <span className="absolute text-[9px] font-semibold text-slate-400 select-none" style={{ top: '27%', left: '38%' }}>Patna</span>
-        <span className="absolute text-[9px] font-semibold text-slate-400 select-none" style={{ top: '42%', left: '30%' }}>Gaya</span>
-        <span className="absolute text-[9px] font-semibold text-slate-400 select-none" style={{ top: '25%', left: '72%' }}>Siliguri</span>
-        <span className="absolute text-[9px] font-semibold text-slate-400 select-none" style={{ top: '47%', left: '74%' }}>Kolkata</span>
-        <span className="absolute text-[9px] font-semibold text-slate-400 select-none" style={{ top: '62%', left: '22%' }}>Bhubaneswar</span>
+      {/* Real Map */}
+      <div className="relative w-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style={{ height: '520px', zIndex: 1 }}>
+        <MapContainer
+          center={[23.5, 86.5]}
+          zoom={6.5}
+          scrollWheelZoom={true}
+          className="w-full h-full"
+          zoomControl={false}
+        >
+          <TileLayer
+            url={tileUrl}
+            attribution={tileAttribution}
+          />
+          <FitBounds asms={filteredASMs} />
 
-        {/* Pins */}
-        {filteredASMs.map((asm) => {
-          const x = toX(asm.lng);
-          const y = toY(asm.lat);
-          const isSelected = selectedAsm?.name === asm.name;
+          {filteredASMs.map((asm) => (
+            <Marker
+              key={asm.name}
+              position={[asm.lat, asm.lng]}
+              icon={createColoredIcon(getStatusColor(asm.status))}
+              eventHandlers={{
+                click: () => setSelectedAsm(asm),
+              }}
+            >
+              <Popup>
+                <div className="text-left" style={{ minWidth: '200px' }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-black`}
+                      style={{ backgroundColor: getStatusColor(asm.status) }}>
+                      {asm.initials}
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-slate-900">{asm.name}</p>
+                      <p className="text-[9px] text-slate-500 font-semibold">{asm.region}, {asm.state}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                    <span className="text-slate-400 font-semibold">Achievement</span>
+                    <span className="text-right font-bold text-slate-900">{asm.ach}%</span>
+                    <span className="text-slate-400 font-semibold">Target</span>
+                    <span className="text-right font-bold text-slate-900">{asm.targetPrimary}</span>
+                    <span className="text-slate-400 font-semibold">Slab Upside</span>
+                    <span className="text-right font-bold text-orange-600">{asm.upside}</span>
+                    <span className="text-slate-400 font-semibold">Status</span>
+                    <span className={`text-right text-[9px] font-bold px-1.5 py-0.5 rounded ${getStatusLabel(asm.status)}`}>
+                      {asm.status}
+                    </span>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
 
-          return (
-            <div key={asm.name}>
-              {/* Pulse ring */}
-              <motion.div
-                animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                className={`absolute w-6 h-6 rounded-full ${getStatusColor(asm.status)} pointer-events-none`}
-                style={{ left: `calc(${x}% - 12px)`, top: `calc(${y}% - 12px)`, opacity: 0.25 }}
-              />
-
-              {/* Pin */}
-              <button
-                type="button"
-                onClick={() => setSelectedAsm(isSelected ? null : asm)}
-                className={`absolute flex items-center justify-center w-8 h-8 rounded-full text-white text-xs font-black shadow-lg border-2 border-white transition-all cursor-pointer z-10 ${getStatusColor(asm.status)} ${getStatusRing(asm.status)} ${isSelected ? 'scale-125 z-20' : 'hover:scale-110'}`}
-                style={{ left: `calc(${x}% - 16px)`, top: `calc(${y}% - 16px)` }}
-                title={asm.name}
-              >
-                {asm.initials}
-              </button>
-
-              {/* Label */}
-              <span
-                className={`absolute text-[10px] font-bold transition-all pointer-events-none select-none ${isSelected ? 'text-slate-900' : 'text-slate-500'}`}
-                style={{ left: `calc(${x}% + 10px)`, top: `calc(${y}% - 4px)` }}
-              >
-                {asm.name.split(' ')[0]}
-              </span>
-            </div>
-          );
-        })}
+        {/* Map Controls Overlay */}
+        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
+          <div className="glass-panel bg-white/90 backdrop-blur-md rounded-xl p-2 border border-slate-100 shadow-sm flex flex-col gap-1">
+            <button type="button" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 cursor-pointer" title="Zoom In"
+              onClick={() => document.querySelector('.leaflet-control-zoom-in')?.dispatchEvent(new MouseEvent('click'))}>
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
         {/* Map Legend */}
-        <div className="absolute bottom-4 left-4 glass-panel bg-white/80 backdrop-blur-md rounded-xl p-3 border border-slate-100 shadow-sm flex items-center gap-4">
+        <div className="absolute bottom-4 left-4 z-[1000] glass-panel bg-white/90 backdrop-blur-md rounded-xl p-3 border border-slate-100 shadow-sm flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#10b981' }} />
             <span className="text-[9px] font-bold text-slate-500">Excellent</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#2563eb' }} />
             <span className="text-[9px] font-bold text-slate-500">On Track</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#dc2626' }} />
             <span className="text-[9px] font-bold text-slate-500">Critical</span>
           </div>
-        </div>
-
-        {/* Compass */}
-        <div className="absolute top-4 right-4 glass-panel bg-white/80 backdrop-blur-md rounded-xl p-2.5 border border-slate-100 shadow-sm">
-          <Navigation className="w-4 h-4 text-slate-400" />
         </div>
       </div>
 
@@ -174,7 +209,8 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0 ${getStatusColor(asm.status)}`}>
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0`}
+                  style={{ backgroundColor: getStatusColor(asm.status) }}>
                   {asm.initials}
                 </div>
                 <div className="min-w-0">
@@ -206,7 +242,8 @@ export default function ASMMapPage({ searchFilter }: ASMMapPageProps) {
           >
             <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-4 text-white flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-black ${getStatusColor(selectedAsm.status)}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-black`}
+                  style={{ backgroundColor: getStatusColor(selectedAsm.status) }}>
                   {selectedAsm.initials}
                 </div>
                 <div>

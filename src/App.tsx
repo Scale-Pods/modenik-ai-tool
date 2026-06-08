@@ -42,6 +42,9 @@ export default function App() {
   const [isSupportOpen, setIsSupportOpen] = useState<boolean>(false);
   const [plannerOptimizing, setPlannerOptimizing] = useState(false);
   const [plannerOptimized, setPlannerOptimized] = useState(false);
+  const [plannerView, setPlannerView] = useState<'weekly' | 'monthly'>('weekly');
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
 
   const handleLoginSuccess = (selectedRole: Role) => {
     setRole(selectedRole);
@@ -158,34 +161,58 @@ export default function App() {
                       <p className="text-sm font-semibold text-slate-500">Route &amp; Travel optimization for Rakesh</p>
                     </div>
 
-                    <button 
-                      type="button"
-                      onClick={handleOptimizeRoute}
-                      disabled={plannerOptimizing}
-                      className={`px-5 py-3 rounded-xl font-bold text-xs select-none shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 text-white ${
-                        plannerOptimized ? 'bg-emerald-600' : 'bg-slate-950 hover:bg-blue-700'
-                      }`}
-                    >
-                      {plannerOptimizing ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          <span>Recalculating...</span>
-                        </>
-                      ) : plannerOptimized ? (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-white" />
-                          <span>AI Route Optimized ✓</span>
-                        </>
-                      ) : (
-                        <>
-                          <Route className="w-4 h-4" />
-                          <span>Optimize Travel Route</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {/* View Toggle */}
+                      <div className="glass-panel rounded-lg p-0.5 border border-slate-200 flex bg-slate-50">
+                        <button
+                          type="button"
+                          onClick={() => setPlannerView('weekly')}
+                          className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            plannerView === 'weekly' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-700'
+                          }`}
+                        >
+                          Weekly
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPlannerView('monthly')}
+                          className={`px-3 py-1.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            plannerView === 'monthly' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-700'
+                          }`}
+                        >
+                          Monthly
+                        </button>
+                      </div>
+
+                      <button 
+                        type="button"
+                        onClick={handleOptimizeRoute}
+                        disabled={plannerOptimizing}
+                        className={`px-5 py-3 rounded-xl font-bold text-xs select-none shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 text-white ${
+                          plannerOptimized ? 'bg-emerald-600' : 'bg-slate-950 hover:bg-blue-700'
+                        }`}
+                      >
+                        {plannerOptimizing ? (
+                          <>
+                            <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            <span>Recalculating...</span>
+                          </>
+                        ) : plannerOptimized ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-white" />
+                            <span>AI Route Optimized ✓</span>
+                          </>
+                        ) : (
+                          <>
+                            <Route className="w-4 h-4" />
+                            <span>Optimize Travel Route</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Operational Agenda split layout */}
@@ -207,50 +234,137 @@ export default function App() {
                         </div>
                       )}
 
-                      <div className="glass-panel rounded-2xl p-6 space-y-4">
-                        <div className="flex justify-between items-center select-none pb-2 border-b border-indigo-50">
-                          <h3 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Weekly Visits Schedule</h3>
-                          <span className="text-[10px] bg-blue-50 text-blue-700 font-extrabold px-2 py-0.5 rounded-full">5 Days Plan</span>
-                        </div>
+                      {/* Weekly List View */}
+                      {plannerView === 'weekly' && (
+                        <div className="glass-panel rounded-2xl p-6 space-y-4">
+                          <div className="flex justify-between items-center select-none pb-2 border-b border-indigo-50">
+                            <h3 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Weekly Visits Schedule</h3>
+                            <span className="text-[10px] bg-blue-50 text-blue-700 font-extrabold px-2 py-0.5 rounded-full">5 Days Plan</span>
+                          </div>
 
-                        <div className="divide-y divide-slate-100 space-y-2">
-                          {weeklyPlannerVisits.map((v, i) => {
-                            const statusColor = v.status === 'COMPLETED' 
-                              ? 'bg-emerald-100 text-emerald-800' 
-                              : v.status === 'SCHEDULED' 
-                              ? 'bg-blue-105 text-blue-800' 
-                              : 'bg-slate-100 text-slate-500';
+                          <div className="divide-y divide-slate-100 space-y-2">
+                            {weeklyPlannerVisits.map((v, i) => {
+                              const statusColor = v.status === 'COMPLETED' 
+                                ? 'bg-emerald-100 text-emerald-800' 
+                                : v.status === 'SCHEDULED' 
+                                ? 'bg-blue-105 text-blue-800' 
+                                : 'bg-slate-100 text-slate-500';
 
-                            return (
-                              <div key={v.day} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 first:pt-1 last:pb-1">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-12 text-center shrink-0">
-                                    <p className="text-xs font-black text-slate-850">{v.day.slice(0, 3)}</p>
-                                    <p className="text-[10px] font-bold text-slate-400 font-mono">Day {i + 1}</p>
+                              return (
+                                <div key={v.day} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 first:pt-1 last:pb-1">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-12 text-center shrink-0">
+                                      <p className="text-xs font-black text-slate-850">{v.day.slice(0, 3)}</p>
+                                      <p className="text-[10px] font-bold text-slate-400 font-mono">Day {i + 1}</p>
+                                    </div>
+                                    <div className="h-8 w-[1.5px] bg-slate-200"></div>
+                                    <div>
+                                      <h4 className="text-xs font-bold text-slate-900">{v.client}</h4>
+                                      <p className="text-[10.5px] text-slate-500 font-semibold flex items-center gap-1 mt-0.5">
+                                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                                        <span>{v.address}</span>
+                                      </p>
+                                    </div>
                                   </div>
-                                  <div className="h-8 w-[1.5px] bg-slate-150"></div>
-                                  <div>
-                                    <h4 className="text-xs font-bold text-slate-900">{v.client}</h4>
-                                    <p className="text-[10.5px] text-slate-500 font-semibold flex items-center gap-1 mt-0.5">
-                                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                                      <span>{v.address}</span>
-                                    </p>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs font-extrabold text-slate-400 font-mono flex items-center gap-1">
+                                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                      <span>{v.time}</span>
+                                    </span>
+                                    <span className={`px-2.5 py-0.5 text-[9px] font-black rounded ${statusColor}`}>
+                                      {v.status}
+                                    </span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                  <span className="text-xs font-extrabold text-slate-400 font-mono flex items-center gap-1">
-                                    <Clock className="w-3.5 h-3.5 text-slate-405" />
-                                    <span>{v.time}</span>
-                                  </span>
-                                  <span className={`px-2.5 py-0.5 text-[9px] font-black rounded ${statusColor}`}>
-                                    {v.status}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+                      {/* Monthly Calendar View */}
+                      {plannerView === 'monthly' && (
+                        <div className="glass-panel rounded-2xl p-6 space-y-4">
+                          <div className="flex items-center justify-between select-none pb-2 border-b border-indigo-50">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (calendarMonth === 0) { setCalendarMonth(11); setCalendarYear(y => y - 1); }
+                                else { setCalendarMonth(m => m - 1); }
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <h3 className="text-sm font-bold text-slate-900 tracking-tight uppercase">
+                              {new Date(calendarYear, calendarMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}
+                            </h3>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (calendarMonth === 11) { setCalendarMonth(0); setCalendarYear(y => y + 1); }
+                                else { setCalendarMonth(m => m + 1); }
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                          </div>
+
+                          {/* Day headers */}
+                          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                              <div key={d} className="py-1.5">{d}</div>
+                            ))}
+                          </div>
+
+                          {/* Calendar grid */}
+                          <div className="grid grid-cols-7 gap-1">
+                            {(() => {
+                              const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+                              const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+                              const today = new Date();
+                              const cells: React.ReactNode[] = [];
+
+                              for (let i = 0; i < firstDay; i++) {
+                                cells.push(<div key={`empty-${i}`} className="h-10" />);
+                              }
+
+                              for (let day = 1; day <= daysInMonth; day++) {
+                                const date = new Date(calendarYear, calendarMonth, day);
+                                const dayName = date.toLocaleString('default', { weekday: 'long' });
+                                const visit = weeklyPlannerVisits.find((_, i) => {
+                                  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                                  return dayNames[i] === dayName;
+                                });
+                                const isToday = day === today.getDate() && calendarMonth === today.getMonth() && calendarYear === today.getFullYear();
+
+                                cells.push(
+                                  <div
+                                    key={day}
+                                    className={`h-10 rounded-lg flex flex-col items-center justify-center text-xs font-semibold relative transition-colors ${
+                                      isToday ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-50 text-slate-700'
+                                    } ${visit && !isToday ? 'bg-blue-50' : ''}`}
+                                  >
+                                    <span>{day}</span>
+                                    {visit && (
+                                      <span className={`absolute -bottom-0.5 w-1 h-1 rounded-full ${visit.status === 'COMPLETED' ? 'bg-emerald-500' : visit.status === 'SCHEDULED' ? 'bg-blue-500' : 'bg-slate-300'}`} />
+                                    )}
+                                  </div>
+                                );
+                              }
+                              return cells;
+                            })()}
+                          </div>
+
+                          {/* Legend */}
+                          <div className="flex items-center gap-4 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-400">
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Completed</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500" /> Scheduled</span>
+                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-600" /> Today</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Operational Guidelines assistant (Right side sidebar list) */}

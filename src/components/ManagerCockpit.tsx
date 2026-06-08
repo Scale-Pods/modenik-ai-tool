@@ -32,7 +32,7 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports, onNa
 
   const statesGrowth = [
     { name: 'Odisha', value: '+12.4%', percentage: 85, color: 'bg-emerald-600' },
-    { name: 'Bihar', value: '+8.1%', percentage: 60, color: 'bg-blue-650' },
+    { name: 'Bihar', value: '+8.1%', percentage: 60, color: 'bg-blue-600' },
     { name: 'West Bengal', value: '+2.4%', percentage: 25, color: 'bg-slate-400' }
   ];
 
@@ -110,7 +110,7 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports, onNa
             <div className="h-2 w-full rounded bg-blue-700"></div>
             <div className="h-2 w-full rounded bg-blue-700"></div>
             <div className="h-2 w-full rounded bg-blue-700"></div>
-            <div className="h-2 w-full rounded bg-slate-100 border border-slate-205"></div>
+            <div className="h-2 w-full rounded bg-slate-200 border border-slate-300"></div>
           </div>
           <p className="text-xs text-slate-500 font-bold mt-1">
             5 of 6 ASMs exceeding 85% Ach
@@ -241,7 +241,7 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports, onNa
 
                 return (
                   <div key={member.name} className="flex-grow h-full flex flex-col justify-end items-center relative group">
-                    <div className="absolute bottom-0 w-full h-[85%] bg-slate-50 rounded-t border-t border-slate-150" />
+                    <div className="absolute bottom-0 w-full h-[85%] bg-slate-100 rounded-t border-t border-slate-200" />
                     
                     <motion.div 
                       initial={{ height: 0 }}
@@ -278,7 +278,7 @@ export default function ManagerCockpit({ searchFilter, onNavigateToReports, onNa
                   <span className="font-extrabold text-slate-800 text-xs">{s.name}</span>
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-black text-emerald-600 tabular-nums">{s.value}</span>
-                    <div className="h-1.5 w-16 bg-slate-150 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-16 bg-slate-200 rounded-full overflow-hidden">
                       <div className={`h-full ${s.color} rounded-full`} style={{ width: `${s.percentage}%` }}></div>
                     </div>
                   </div>

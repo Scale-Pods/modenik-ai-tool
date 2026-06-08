@@ -29,7 +29,14 @@ export default function LandingPage({ onEnterDashboard }: LandingPageProps) {
 
       {/* Navigation Header */}
       <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between z-10 shrink-0">
-        <Logo variant="banner" size="md" />
+        <div className="flex items-center gap-4">
+          <Logo variant="banner" size="md" />
+          <div className="h-10 w-[1px] bg-slate-300" />
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Powered by</span>
+            <img src="/assets/ScalePods-logo.png" alt="ScalePods" className="h-9 w-auto" />
+          </div>
+        </div>
         <button 
           type="button"
           onClick={onEnterDashboard}

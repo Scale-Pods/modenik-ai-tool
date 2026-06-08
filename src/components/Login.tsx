@@ -59,8 +59,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         className="w-full max-w-[440px] z-10 glass-panel rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.06)] p-8 flex flex-col items-center gap-8 transition-all hover:shadow-[0_25px_60px_rgba(0,0,0,0.08)]"
       >
         {/* Branding & Visual Identity */}
-        <div className="flex flex-col items-center gap-2 text-center pb-2 border-b border-slate-100 w-full">
+        <div className="flex flex-col items-center gap-3 text-center pb-4 border-b border-slate-100 w-full">
           <Logo variant="light" size="xl" showText={true} />
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Powered by</span>
+            <img src="/assets/ScalePods-logo.png" alt="ScalePods" className="h-6 w-auto" />
+          </div>
         </div>
 
         {/* Credentials Form Section */}

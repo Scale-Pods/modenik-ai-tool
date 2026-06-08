@@ -131,7 +131,7 @@ export default function BattleCardModal({
           </div>
 
           <div class="section">
-            <div class="label">Product Line Competitive Analysis (Estimated ROI)</div>
+            <div class="label">Product Line Analysis (Estimated ROI)</div>
             <table>
               <thead>
                 <tr>
@@ -151,11 +151,18 @@ export default function BattleCardModal({
                   <td><span class="badge badge-emerald">MOMENTUM</span></td>
                 </tr>
                 <tr>
-                  <td>Lux Venus Vest (Competitor)</td>
-                  <td>₹105</td>
-                  <td>12.5%</td>
-                  <td>10 Days</td>
-                  <td><span>SATURATED</span></td>
+                  <td><strong>Dixcy Scott Trunk (Modenik)</strong></td>
+                  <td>₹180</td>
+                  <td style="color: #059669; font-weight: bold;">16.5%</td>
+                  <td>4 Days</td>
+                  <td><span class="badge badge-emerald">HIGH VOLUME</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Dixcy Scott Brief (Modenik)</strong></td>
+                  <td>₹130</td>
+                  <td style="color: #059669; font-weight: bold;">17.2%</td>
+                  <td>4 Days</td>
+                  <td><span class="badge badge-blue">STABLE</span></td>
                 </tr>
               </tbody>
             </table>
@@ -178,7 +185,11 @@ export default function BattleCardModal({
   };
 
   const handleShareWhatsApp = () => {
-    const message = `*Modenik Slab Details for ${distributorName || 'UP DB'}*:\n\n• Target Challenge: Add *₹40 L* primary order to unlock *₹2 L* extra incentive (2.0% Slab Unlock).\n• Replenishment: 4-day quick turnaround.\n\nCalculate your ROI now: Modenik Josh Vest gives 18% margin (vs 12.5% competitor standard). Let's unlock the next slab!`;
+    // Trigger PDF download first
+    handleDownloadSlab();
+    
+    // Open WhatsApp with document reference message
+    const message = `*Modenik Slab Details for ${distributorName || 'UP DB'}*:\n\nHi! I have generated the official Slab Projections PDF for your account. Please find the document downloaded on your device, and you can attach it here to review the milestones.`;
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -369,13 +380,24 @@ export default function BattleCardModal({
                       </td>
                     </tr>
                     <tr className="bg-slate-50/20 text-slate-600">
-                      <td className="px-4 py-3">Lux Venus Vest (Competitor)</td>
-                      <td className="px-4 py-3 text-slate-400 tabular-nums">₹105</td>
-                      <td className="px-4 py-3 text-right font-semibold tabular-nums">12.5%</td>
-                      <td className="px-4 py-3 text-right tabular-nums">14.8%</td>
+                      <td className="px-4 py-3 font-bold text-slate-900">Dixcy Scott Trunk (Modenik)</td>
+                      <td className="px-4 py-3 text-slate-500 tabular-nums">₹180</td>
+                      <td className="px-4 py-3 text-right font-black text-emerald-600 select-none tabular-nums">16.5%</td>
+                      <td className="px-4 py-3 text-right font-black text-slate-900 tabular-nums">19.8%</td>
                       <td className="px-4 py-3">
-                        <span className="px-1.5 py-0.5 bg-slate-100 text-slate-550 font-bold rounded text-[9px] select-none">
-                          SATURATED
+                        <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded text-[9px]">
+                          HIGH VOLUME
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 font-bold text-slate-900">Dixcy Scott Brief (Modenik)</td>
+                      <td className="px-4 py-3 text-slate-500 tabular-nums">₹130</td>
+                      <td className="px-4 py-3 text-right font-black text-blue-600 select-none tabular-nums">17.2%</td>
+                      <td className="px-4 py-3 text-right font-black text-slate-900 tabular-nums">21.0%</td>
+                      <td className="px-4 py-3">
+                        <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 font-bold rounded text-[9px]">
+                          STABLE
                         </span>
                       </td>
                     </tr>
