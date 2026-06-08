@@ -1,9 +1,4 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   CalendarDays, 
@@ -22,9 +17,13 @@ import DistributorDetails from './components/DistributorDetails';
 import ManagerCockpit from './components/ManagerCockpit';
 import Phase23Preview from './components/Phase23Preview';
 import BattleCardModal from './components/BattleCardModal';
-import Profile from './components/Profile';
+import ASMProfile from './components/ASMProfile';
+import ManagerProfile from './components/ManagerProfile';
+import LandingPage from './components/LandingPage';
+import SupportModal from './components/SupportModal';
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState<boolean>(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [role, setRole] = useState<Role>('ASM');
   const [activeScreen, setActiveScreen] = useState<Screen>('dashboard');
@@ -35,6 +34,7 @@ export default function App() {
     distributorName: 'UP DB (1004821)'
   });
 
+  const [isSupportOpen, setIsSupportOpen] = useState<boolean>(false);
   const [plannerOptimizing, setPlannerOptimizing] = useState(false);
   const [plannerOptimized, setPlannerOptimized] = useState(false);
 
@@ -52,7 +52,19 @@ export default function App() {
     }, 1500);
   };
 
-  // 1. Rendering Login screen when unauthenticated
+  // Wire up support helpdesk event listener at the component top-level
+  useEffect(() => {
+    const handleSupportClick = () => setIsSupportOpen(true);
+    window.addEventListener('open-support-helpdesk', handleSupportClick);
+    return () => window.removeEventListener('open-support-helpdesk', handleSupportClick);
+  }, []);
+
+  // 1. Rendering Landing Page when showLanding is true
+  if (showLanding) {
+    return <LandingPage onEnterDashboard={() => setShowLanding(false)} />;
+  }
+
+  // 2. Rendering Login screen when unauthenticated
   if (!isLoggedIn) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
@@ -72,14 +84,20 @@ export default function App() {
       <Navigation 
         role={role}
         activeScreen={activeScreen}
-        onScreenChange={setActiveScreen}
+        onScreenChange={(screen) => {
+          if (screen === 'profile') {
+            setActiveScreen('profile');
+          } else {
+            setActiveScreen(screen);
+          }
+        }}
         onSwitchRole={() => setIsLoggedIn(false)}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
 
       {/* Main Workspace Frame container */}
-      <main className="flex-grow md:pl-64 py-8 px-6 pb-24 md:pb-8">
+      <main className="flex-grow md:pl-24 py-8 px-6 pb-24 md:pb-8 transition-all duration-305">
         <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
@@ -164,10 +182,10 @@ export default function App() {
                         <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-start gap-3">
                           <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
                           <div>
-                            <p className="text-xs text-emerald-950 font-bold">
+                            <p className="text-xs text-emerald-955 font-bold">
                               Route sequence rearranged dynamically.
                             </p>
-                            <p className="text-[10.5px] text-emerald-800">
+                            <p className="text-[10.5px] text-emerald-800 font-semibold">
                               Estimated travel time reduced by 42 minutes based on traffic and geographic clusters.
                             </p>
                           </div>
@@ -185,7 +203,7 @@ export default function App() {
                             const statusColor = v.status === 'COMPLETED' 
                               ? 'bg-emerald-100 text-emerald-800' 
                               : v.status === 'SCHEDULED' 
-                              ? 'bg-blue-105 text-blue-800 animate-pulse' 
+                              ? 'bg-blue-105 text-blue-800' 
                               : 'bg-slate-100 text-slate-500';
 
                             return (
@@ -206,7 +224,7 @@ export default function App() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                   <span className="text-xs font-extrabold text-slate-400 font-mono flex items-center gap-1">
-                                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                    <Clock className="w-3.5 h-3.5 text-slate-405" />
                                     <span>{v.time}</span>
                                   </span>
                                   <span className={`px-2.5 py-0.5 text-[9px] font-black rounded ${statusColor}`}>
@@ -224,12 +242,12 @@ export default function App() {
                     <aside className="glass-panel p-6 rounded-2xl space-y-6">
                       <div className="flex items-center gap-2 select-none">
                         <CalendarDays className="w-6 h-6 text-blue-700" />
-                        <h3 className="text-sm font-bold text-slate-950 tracking-tight uppercase">Visit Protocol</h3>
+                        <h3 className="text-sm font-bold text-slate-955 tracking-tight uppercase">Visit Protocol</h3>
                       </div>
 
                       <div className="space-y-4 text-xs text-slate-600 leading-relaxed font-semibold">
                         <div className="p-3 bg-red-50 text-red-950 rounded-xl border border-red-100 flex items-start gap-2.5">
-                          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                          <AlertCircle className="w-4 h-4 text-red-655 shrink-0" />
                           <p className="text-[11px]">
                             Always review the active <strong>AI Battle Card</strong> immediately before greeting the distributor.
                           </p>
@@ -237,17 +255,17 @@ export default function App() {
 
                         <div className="flex gap-2">
                           <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-705 font-bold select-none text-[10px]">1</div>
-                          <p className="leading-snug">Perform physical catalog audit of shelves to record actual competitor stocks.</p>
+                          <p className="leading-snug">Perform physical catalog audit of shelves to record competitor stocks.</p>
                         </div>
 
                         <div className="flex gap-2">
                           <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-705 font-bold select-none text-[10px]">2</div>
-                          <p className="leading-snug">Validate outstanding ledger sync via SAP connector to guarantee order release.</p>
+                          <p className="leading-snug">Validate outstanding ledger sync via SAP connector to guarantee release.</p>
                         </div>
 
                         <div className="flex gap-2">
                           <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-705 font-bold select-none text-[10px]">3</div>
-                          <p className="leading-snug">Present the Milestones Ladder targets with the dynamic payout calculators.</p>
+                          <p className="leading-snug">Present the Milestones Ladder targets with the payout calculators.</p>
                         </div>
                       </div>
                     </aside>
@@ -258,12 +276,12 @@ export default function App() {
               {/* SCREEN 4: Combined futuristic Phase 2 & 3 Previews */}
               {activeScreen === 'phase23' && <Phase23Preview />}
 
-              {/* SCREEN 5: Interactive Profile Page */}
-              {activeScreen === 'profile' && (
-                <Profile 
-                  role={role}
-                  onLogout={() => setIsLoggedIn(false)}
-                />
+              {/* SCREEN 5: Separated Role Profile Pages */}
+              {activeScreen === 'profile' && role === 'ASM' && (
+                <ASMProfile onLogout={() => setIsLoggedIn(false)} />
+              )}
+              {activeScreen === 'profile' && role === 'Manager' && (
+                <ManagerProfile onLogout={() => setIsLoggedIn(false)} />
               )}
             </motion.div>
           </AnimatePresence>
@@ -275,6 +293,12 @@ export default function App() {
         isOpen={battleCard.isOpen}
         onClose={() => setBattleCard({ ...battleCard, isOpen: false })}
         distributorName={battleCard.distributorName}
+      />
+
+      {/* Interactive Support Modal helpdesk */}
+      <SupportModal 
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
       />
     </div>
   );

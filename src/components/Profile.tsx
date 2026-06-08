@@ -14,8 +14,7 @@ import {
   Briefcase, 
   Award,
   Layers,
-  ChevronRight,
-  TrendingUpIcon
+  ChevronRight
 } from 'lucide-react';
 import { Role } from '../types';
 
@@ -47,8 +46,9 @@ export default function Profile({ role, onLogout }: ProfileProps) {
   const projectedEarning = Math.round(newTotalPrimary * (payoutRate / 100));
   const incrementalEarning = projectedEarning - Math.round(activeDB.currentPrimary * (1.8 / 100));
 
-  const asmAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuAwTiCKK_qnASZQZA0bp3d5kiCxn4j9sZ_7HLs2DrotFj4BvC94nIDHxgE787v7RY3JwZpHBIr_r8d9RY0YddpbZWEFcepqsNSPshHP3LB4X8A1vZAXVlS_fbzNf0mC1U49KxIw0fwKKdLWj5RYGxTN9-mDF59m6REMMhq9NGY1mTwHF9Va7zs4Z3XRlLHFT9Ug1QtYdIYJ4bMFFr1Ap-dvIrA7WfpW2Yktu-XFmCQy_xnzuS49i3uZlh771vW1nSlDgmPFhtVser0u";
-  const managerAvatar = "https://lh3.googleusercontent.com/aida-public/AB6AXuC012eB56OiNwURTIVxTwWBNtqP-eSU5cZh1FGxxtwy8EwaPXaTL2NERKFJnP97-psyGYW6JLWAN9L3415elDHmKAObQPwVLbWPPcy0OausyQBWEVzhUZxI33su-Ba7ucL76UdMdoMKif8PYODAD1RkfsERZFo98xiNkyI_OpDrS1sBhdGyxe3zJ_lelcaX_4Ubkk7iU9uPTuUcixAKLQGERXKbRfAKs54_0M1rSUyvprCIcBWb8CnH1fgVEfHavAnPHNd9gZYVudZu";
+  // Professional Unsplash profile headshots instead of AI faces
+  const asmAvatar = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80";
+  const managerAvatar = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80";
 
   return (
     <motion.div 
@@ -95,7 +95,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
             </div>
 
             <div className="space-y-1 relative z-10 w-full">
-              <h3 className="text-xl font-black text-slate-950 tracking-tight">
+              <h3 className="text-xl font-black text-slate-955">
                 {role === 'ASM' ? 'Rakesh Kumar Parida' : 'Manoranjan'}
               </h3>
               <p className="text-xs font-bold text-blue-750 uppercase tracking-wider">
@@ -108,7 +108,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
             </div>
 
             {/* Role details table list */}
-            <div className="w-full border-t border-slate-100 pt-4 space-y-3.5 text-left text-xs font-semibold text-slate-600">
+            <div className="w-full border-t border-slate-100 pt-4 space-y-3.5 text-left text-xs font-semibold text-slate-650">
               <div className="flex justify-between items-center">
                 <span className="flex items-center gap-2 text-slate-450"><Briefcase className="w-4 h-4 text-slate-400" /> Employee ID</span>
                 <span className="font-bold text-slate-900 font-mono">MN-40281</span>
@@ -118,12 +118,12 @@ export default function Profile({ role, onLogout }: ProfileProps) {
                 <span className="font-bold text-slate-900">{role === 'ASM' ? 'GTM_EAST' : 'EAST_HQ'}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="flex items-center gap-2 text-slate-450"><User className="w-4 h-4 text-slate-400" /> Supervisor</span>
+                <span className="flex items-center gap-2 text-slate-455"><User className="w-4 h-4 text-slate-400" /> Supervisor</span>
                 <span className="font-bold text-slate-900">{role === 'ASM' ? 'Manoranjan' : 'Harshal (VP Sales)'}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="flex items-center gap-2 text-slate-450"><Award className="w-4 h-4 text-slate-400" /> Performance Bracket</span>
-                <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Tier A (Exceeding)</span>
+                <span className="flex items-center gap-2 text-slate-455"><Award className="w-4 h-4 text-slate-400" /> Performance Bracket</span>
+                <span className="bg-emerald-100 text-emerald-808 font-bold px-2 py-0.5 rounded text-[10px]">Tier A (Exceeding)</span>
               </div>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
                   <Calculator className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-950 tracking-tight">Target &amp; Incentive Planner</h3>
+                  <h3 className="text-base font-black text-slate-955">Target &amp; Incentive Planner</h3>
                   <p className="text-xs text-slate-500 font-semibold mt-0.5">Interactive Slab Simulator for client negotiations</p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
               {/* Form parameters */}
               <div className="space-y-4 text-left">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">
+                  <label className="text-xs font-bold text-slate-505 uppercase tracking-wider pl-1">
                     Select Distributor
                   </label>
                   <select 
@@ -165,7 +165,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
 
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-center pl-1 select-none">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <label className="text-xs font-bold text-slate-505 uppercase tracking-wider">
                       Additional Primary Target
                     </label>
                     <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
@@ -212,7 +212,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
                 <div className={`p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${
                   isSlabMet 
                     ? 'bg-emerald-50 border-emerald-100 text-emerald-950' 
-                    : 'bg-amber-50 border-amber-100 text-amber-950'
+                    : 'bg-amber-50 border-amber-100 text-amber-955'
                 }`}>
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold flex items-center gap-1.5">
@@ -241,7 +241,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
                     <p className="text-2xl font-black text-slate-900 font-mono">
                       ₹{(projectedEarning / 100000).toFixed(2)} L
                     </p>
-                    <p className={`text-[10px] font-bold mt-1 ${isSlabMet ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    <p className={`text-[10px] font-bold mt-1 ${isSlabMet ? 'text-emerald-700' : 'text-amber-705'}`}>
                       {incrementalEarning > 0 ? `+₹${(incrementalEarning / 100000).toFixed(2)} L extra` : 'No increase'}
                     </p>
                   </div>
@@ -256,7 +256,7 @@ export default function Profile({ role, onLogout }: ProfileProps) {
                   <Layers className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-950 tracking-tight">East Branch Team Summary</h3>
+                  <h3 className="text-base font-black text-slate-955">East Branch Team Summary</h3>
                   <p className="text-xs text-slate-500 font-semibold mt-0.5">Management performance metrics</p>
                 </div>
               </div>
@@ -278,19 +278,19 @@ export default function Profile({ role, onLogout }: ProfileProps) {
                 <h4 className="text-xs font-black text-slate-550 uppercase tracking-widest">Active Q4 Slab Configuration</h4>
                 
                 <div className="divide-y divide-slate-100 text-xs">
-                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-650">
+                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-600">
                     <span>Tier 1: Min 60% (Jan+Feb) &amp; 110% Q4 Target</span>
                     <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">3.0% Payout</span>
                   </div>
-                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-650">
+                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-600">
                     <span>Tier 2: Min 60% (Jan+Feb) &amp; 100% Q4 Target</span>
                     <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">2.5% Payout</span>
                   </div>
-                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-650">
+                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-600">
                     <span>Tier 3: Min 50% (Jan+Feb) &amp; 100% Q4 Target</span>
                     <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">2.0% Payout</span>
                   </div>
-                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-650">
+                  <div className="py-2.5 flex justify-between items-center font-semibold text-slate-600">
                     <span>Tier 4: Min 80% of Full Q4 Target</span>
                     <span className="font-extrabold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">1.0% Payout</span>
                   </div>

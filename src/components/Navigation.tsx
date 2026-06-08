@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -43,6 +38,7 @@ export default function Navigation({
   const [isSyncing, setIsSyncing] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(3);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleSync = () => {
     setIsSyncing(true);
@@ -56,30 +52,43 @@ export default function Navigation({
     { id: 'phase23' as Screen, label: 'Phase 2/3', icon: Rocket, isFuture: true },
   ];
 
+  // Professional Unsplash headshots instead of AI faces
   const profileAvatar = role === 'ASM' 
-    ? "https://lh3.googleusercontent.com/aida-public/AB6AXuAwTiCKK_qnASZQZA0bp3d5kiCxn4j9sZ_7HLs2DrotFj4BvC94nIDHxgE787v7RY3JwZpHBIr_r8d9RY0YddpbZWEFcepqsNSPshHP3LB4X8A1vZAXVlS_fbzNf0mC1U49KxIw0fwKKdLWj5RYGxTN9-mDF59m6REMMhq9NGY1mTwHF9Va7zs4Z3XRlLHFT9Ug1QtYdIYJ4bMFFr1Ap-dvIrA7WfpW2Yktu-XFmCQy_xnzuS49i3uZlh771vW1nSlDgmPFhtVser0u"
-    : "https://lh3.googleusercontent.com/aida-public/AB6AXuC012eB56OiNwURTIVxTwWBNtqP-eSU5cZh1FGxxtwy8EwaPXaTL2NERKFJnP97-psyGYW6JLWAN9L3415elDHmKAObQPwVLbWPPcy0OausyQBWEVzhUZxI33su-Ba7ucL76UdMdoMKif8PYODAD1RkfsERZFo98xiNkyI_OpDrS1sBhdGyxe3zJ_lelcaX_4Ubkk7iU9uPTuUcixAKLQGERXKbRfAKs54_0M1rSUyvprCIcBWb8CnH1fgVEfHavAnPHNd9gZYVudZu";
+    ? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+    : "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80";
 
   const searchPlaceholder = role === 'ASM' ? "Search accounts..." : "Search East Branch...";
 
   return (
     <>
-      {/* 1. Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 bg-white/70 backdrop-blur-xl border-r border-slate-100 p-6 gap-8 z-40 shadow-sm pt-8">
+      {/* 1. Desktop Hover-expanding Sidebar */}
+      <aside 
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`hidden md:flex flex-col fixed left-0 top-0 h-full bg-white/70 backdrop-blur-xl border-r border-slate-100 p-4 gap-8 z-45 shadow-sm pt-8 transition-all duration-300 ease-in-out ${
+          isHovered ? 'w-64 px-6' : 'w-20 px-3.5 items-center'
+        }`}
+      >
         
         {/* Brand section */}
-        <div className="flex flex-col gap-2 select-none border-b border-slate-100 pb-4">
-          <div className="flex items-center justify-between">
-            <Logo variant="light" size="sm" showText={true} />
-            <span className="bg-blue-55 text-blue-700 text-[9px] px-1.5 py-0.5 rounded-full font-bold shrink-0">V2.1</span>
+        <div className={`flex flex-col gap-2 select-none border-b border-slate-100 pb-4 w-full ${isHovered ? '' : 'items-center'}`}>
+          <div className="flex items-center justify-between w-full">
+            <Logo variant="banner" size="md" collapsed={!isHovered} />
+            {isHovered && (
+              <span className="bg-blue-50 text-blue-700 text-[9px] px-1.5 py-0.5 rounded-full font-bold shrink-0">
+                V2.1
+              </span>
+            )}
           </div>
-          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest pl-1">
-            {role === 'ASM' ? 'Sales Assistant' : 'Sales Intelligence'}
-          </p>
+          {isHovered && (
+            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest pl-1">
+              {role === 'ASM' ? 'Sales Assistant' : 'Sales Intelligence'}
+            </p>
+          )}
         </div>
 
         {/* Navigation list */}
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-1 w-full">
           {navItems.map((item) => {
             const IconComponent = item.icon;
             const isActive = activeScreen === item.id;
@@ -90,17 +99,17 @@ export default function Navigation({
                   onScreenChange(item.id);
                   setMobileMenuOpen(false);
                 }}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all relative ${
+                className={`flex items-center rounded-xl text-sm font-semibold transition-all relative ${
                   isActive 
                     ? 'bg-blue-600/10 text-blue-700' 
                     : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                } ${isHovered ? 'px-3.5 py-2.5 justify-between w-full' : 'w-12 h-12 justify-center'}`}
               >
                 <div className="flex items-center gap-3">
-                  <IconComponent className={`w-5 h-5 ${isActive ? 'text-blue-700' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
+                  <IconComponent className={`w-5 h-5 shrink-0 ${isActive ? 'text-blue-700' : 'text-slate-450'}`} />
+                  {isHovered && <span>{item.label}</span>}
                 </div>
-                {item.isFuture && (
+                {isHovered && item.isFuture && (
                   <span className="text-[9px] bg-blue-700 text-white font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider scale-90">
                     Preview
                   </span>
@@ -118,39 +127,48 @@ export default function Navigation({
         </nav>
 
         {/* Bottom items */}
-        <div className="mt-auto pt-6 border-t border-slate-100 flex flex-col gap-1.5 select-none">
+        <div className={`mt-auto pt-6 border-t border-slate-100 flex flex-col gap-1.5 select-none w-full ${isHovered ? '' : 'items-center'}`}>
           
           <button 
             type="button"
             onClick={onSwitchRole}
-            className="w-full bg-slate-900 text-white hover:bg-slate-805 py-2.5 px-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95"
+            className={`bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all active:scale-95 ${
+              isHovered ? 'w-full px-3' : 'w-12 h-12 rounded-xl'
+            }`}
+            title="Switch User Role"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Switch Role</span>
+            <LogOut className="w-3.5 h-3.5 shrink-0" />
+            {isHovered && <span>Switch Role</span>}
           </button>
 
           <button
             type="button"
-            onClick={() => onScreenChange('dashboard')}
-            className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-50 transition-colors w-full text-left"
+            onClick={() => onScreenChange('profile')}
+            className={`flex items-center gap-3 py-2 rounded-xl text-xs font-semibold text-slate-550 hover:bg-slate-50 transition-colors text-left ${
+              isHovered ? 'px-3.5 w-full' : 'w-12 h-12 justify-center'
+            }`}
+            title="Settings"
           >
-            <Settings className="w-4 h-4 text-slate-400" />
-            <span>Settings</span>
+            <Settings className="w-4 h-4 text-slate-450 shrink-0" />
+            {isHovered && <span>Settings</span>}
           </button>
 
           <button
             type="button"
-            onClick={() => onScreenChange('dashboard')}
-            className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-50 transition-colors w-full text-left"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-support-helpdesk'))}
+            className={`flex items-center gap-3 py-2 rounded-xl text-xs font-semibold text-slate-550 hover:bg-slate-50 transition-colors text-left ${
+              isHovered ? 'px-3.5 w-full' : 'w-12 h-12 justify-center'
+            }`}
+            title="Support"
           >
-            <HelpCircle className="w-4 h-4 text-slate-400" />
-            <span>Support</span>
+            <HelpCircle className="w-4 h-4 text-slate-455 shrink-0" />
+            {isHovered && <span>Support</span>}
           </button>
         </div>
       </aside>
 
       {/* 2. Top Navigation Bar */}
-      <header className="flex justify-between items-center w-full px-6 py-4 sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm md:pl-[280px]">
+      <header className="flex justify-between items-center w-full px-6 py-4 sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm md:pl-[104px]">
         
         {/* Left side actions (Hamburger / Search) */}
         <div className="flex items-center gap-4">
@@ -164,7 +182,7 @@ export default function Navigation({
 
           {/* Mobile logo (hidden on desktop) */}
           <div className="md:hidden flex items-center">
-            <Logo variant="light" size="sm" showText={true} />
+            <Logo variant="banner" size="md" showText={true} />
           </div>
 
           <div className="hidden sm:flex items-center bg-slate-50 border border-slate-200/60 rounded-full pl-3.5 pr-4 py-1.5 focus-within:ring-2 focus-within:ring-blue-600/20 focus-within:border-blue-600 transition-all w-64">
@@ -178,19 +196,19 @@ export default function Navigation({
             />
           </div>
 
-          <div className="hidden md:flex items-center gap-1 bg-slate-100/50 text-[11px] font-semibold text-slate-500 px-3 py-1 rounded-full border border-slate-200/20">
+          <div className="hidden md:flex items-center gap-1.5 bg-slate-100/50 text-[11px] font-semibold text-slate-505 px-3 py-1 rounded-full border border-slate-200/20">
             <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${isSyncing ? 'animate-spin' : ''}`} />
             <span>SAP synced · 2 min ago</span>
           </div>
         </div>
 
-        {/* Right side actions (Notifications / Profile context) */}
+        {/* Right side actions (Notifications / Profile) */}
         <div className="flex items-center gap-4">
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <button 
               type="button"
               onClick={handleSync}
-              className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all relative"
+              className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all"
               title="Sync Ledger (SAP)"
             >
               <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -204,7 +222,7 @@ export default function Navigation({
             >
               <Bell className="w-5 h-5" />
               {notifications > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-600 rounded-full text-[9px] font-bold text-white flex items-center justify-center border-2 border-white animate-pulse">
+                <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-655 rounded-full text-[9px] font-bold text-white flex items-center justify-center border-2 border-white animate-pulse">
                   {notifications}
                 </span>
               )}
@@ -250,10 +268,9 @@ export default function Navigation({
               <input 
                 type="text" 
                 value={searchQuery}
-                focused={true}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="bg-transparent border-none text-xs text-slate-800 font-medium focus:outline-none w-full p-0"
+                className="bg-transparent border-none text-xs text-slate-850 font-medium focus:outline-none w-full p-0"
               />
             </div>
 
@@ -271,11 +288,11 @@ export default function Navigation({
                     className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold transition-colors ${
                       isActive 
                         ? 'bg-blue-600/10 text-blue-700' 
-                        : 'text-slate-600'
+                        : 'text-slate-650'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <IconComponent className="w-5 h-5 text-slate-400" />
+                      <IconComponent className="w-5 h-5 text-slate-400 shrink-0" />
                       <span>{item.label}</span>
                     </div>
                   </button>
@@ -301,7 +318,7 @@ export default function Navigation({
       </AnimatePresence>
 
       {/* 4. Touch Mobile Bottom Nav-Bar sticky layout */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 bg-white/85 backdrop-blur-2xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl flex justify-around items-center px-4 py-3 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 w-full z-45 bg-white/85 backdrop-blur-2xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] rounded-t-2xl flex justify-around items-center px-4 py-3 pb-safe">
         {navItems.map((item) => {
           const IconComponent = item.icon;
           const isActive = activeScreen === item.id;
@@ -310,10 +327,10 @@ export default function Navigation({
               key={item.id}
               onClick={() => onScreenChange(item.id)}
               className={`flex flex-col items-center justify-center gap-1 pb-1 transition-all ${
-                isActive ? 'text-blue-700 font-bold scale-105' : 'text-slate-400 font-medium'
+                isActive ? 'text-blue-700 font-bold scale-105' : 'text-slate-450 font-medium'
               }`}
             >
-              <IconComponent className="w-5 h-5 text-current" />
+              <IconComponent className="w-5 h-5 text-current shrink-0" />
               <span className="text-[10px] tracking-tight">{item.label}</span>
             </button>
           );
